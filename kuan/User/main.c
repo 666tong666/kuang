@@ -34,6 +34,14 @@ extern int16_t gx_off, gy_off, gz_off;
  * 远低于50ppm报警线; 相对浓度眮Ｈ园磀atasheet曲线斜率响应) */
 #define MQ135_CLEAN_RS_RATIO  3.4f
 
+/* MQ135预热校准策略: 加热丝到工作温度需1~3分钟, 冷态时Rs偏高,
+ * 校准太早会使R0偏大 -> 热透后ppm直接顶格9999。
+ * 至少预热MIN秒, 每1秒比对ADC均值, 连续STABLE秒漂移<2%才算稳定,
+ * 最长MAX秒强制校准(新传感器首次使用建议先通电老化数小时) */
+#define MQ135_WARMUP_MIN_S    60
+#define MQ135_WARMUP_MAX_S    300
+#define MQ135_STABLE_NEED_S   20
+
 /*阈值配置*/
 #define TEMP_MAX       32      // 温度上限 ℃
 float gas_max = 50.0f;         // 气体等效ppm上限(可由小程序经BLE下发修改)
@@ -144,6 +152,70 @@ static void MQ135_Calibrate(void)
     Rs = RL * (4095.0f / (float)adc - 1.0f);
     gas_r0 = Rs / MQ135_CLEAN_RS_RATIO;
     printf("MQ135 cal: adc=%d Rs=%.2fk R0=%.2fk\r\n", adc, Rs, gas_r0);
+
+    /* 基线合法性检查: adc贴顶/贴底说明硬件异常, 保留默认R0并打印排查方向 */
+    if(adc >= 4000)
+    {
+        gas_r0 = R0;
+        printf("[MQ135][ERR] adc=%d 顶格! 排查: 1)是否误接模块DO脚(应接AO/AOUT) "
+               "2)5V供电模块AOUT可超3.3V, 需分压或改3.3V供电 3)传感器内阻过低\r\n", adc);
+    }
+    else if(adc <= 20)
+    {
+        gas_r0 = R0;
+        printf("[MQ135][ERR] adc=%d 贴底! 排查: AO信号线未接好 / 模块未供电 / "
+               "加热丝开路(传感器两脚间应有约1V压降)\r\n", adc);
+    }
+    else if(gas_r0 < 1.0f || gas_r0 > 500.0f)
+    {
+        printf("[MQ135][WARN] R0=%.2fk 超出1~500k合理区间, 已限幅\r\n", gas_r0);
+        if(gas_r0 < 1.0f)   gas_r0 = 1.0f;
+        if(gas_r0 > 500.0f) gas_r0 = 500.0f;
+    }
+}
+
+/* MQ135预热+校准: 等加热丝热透、读数稳定后再取基线
+ * 稳定判据: 每秒1次ADC均值(16次采样), 相邻漂移<2%且连续MQ135_STABLE_NEED_S秒 */
+static void MQ135_WarmupAndCalibrate(void)
+{
+    uint16_t waited_s = 0;
+    uint8_t  stable_s = 0;
+    uint16_t adc_ref  = MQ135_Get_ADC_Avg(16);
+
+    printf("MQ135 warming up %d~%ds, keep clean air...\r\n",
+           MQ135_WARMUP_MIN_S, MQ135_WARMUP_MAX_S);
+
+    while(waited_s < MQ135_WARMUP_MAX_S)
+    {
+        delay_ms(1000);
+        waited_s++;
+
+        uint16_t adc_now = MQ135_Get_ADC_Avg(16);
+        int32_t  drift   = (int32_t)adc_now - (int32_t)adc_ref;
+        if(drift < 0) drift = -drift;
+        if(drift <= (int32_t)adc_ref / 50) stable_s++;   /* 漂移<2% */
+        else                              stable_s = 0;
+        adc_ref = adc_now;
+
+        /* OLED: 第3行显示预热秒数与稳定秒数 */
+        OLED_ShowString(3, 1,  "warm ");
+        OLED_ShowNum(3, 6,  waited_s, 3);
+        OLED_ShowString(3, 9,  "s stb");
+        OLED_ShowNum(3, 14, stable_s, 2);
+
+        if(waited_s % 10 == 0)
+        {
+            printf("  warm %us: adc=%d stable=%us\r\n", waited_s, adc_now, stable_s);
+        }
+
+        if(waited_s >= MQ135_WARMUP_MIN_S && stable_s >= MQ135_STABLE_NEED_S)
+        {
+            break;
+        }
+    }
+    printf("MQ135 warmup finished in %us (stable=%us), calibrating...\r\n",
+           waited_s, stable_s);
+    MQ135_Calibrate();
 }
 
 /* ================ BLE 下行指令处理 ================ */
@@ -231,13 +303,11 @@ int main(void)
     delay_ms(200);
     MPU6050_CalibrateGyro();
 
-    /* MQ135预热+校准: 保持周围空气清洁, 预热后自动取基线 */
+    /* MQ135预热+校准: 等读数稳定后自动取清洁空气基线(60~300s) */
     OLED_Clear();
     OLED_ShowString(1, 1, "MQ135 warming up");
     OLED_ShowString(2, 1, "keep clean air!");
-    printf("MQ135 warming up 10s, keep clean air...\r\n");
-    delay_ms(10000);
-    MQ135_Calibrate();
+    MQ135_WarmupAndCalibrate();
     OLED_Clear();
 
     printf("Initialization Complete!\r\n");
@@ -263,6 +333,7 @@ int main(void)
         // MQ135 气体浓度计算: 16次均值滤波 + 温湿度修正 + 校准后的R0
         adc_val = MQ135_Get_ADC_Avg(16);
         if(adc_val < 10) adc_val = 10;              /* 防除零 */
+        if(gas_r0 < 0.01f) gas_r0 = R0;             /* R0异常时兜底, 防除零出NaN */
         {
             float temp_now = temp_int + temp_deci / 10.0f;
             float humi_now = humi_int + humi_deci / 10.0f;
