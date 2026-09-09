@@ -48,10 +48,11 @@ float gas_max = 50.0f;         // 气体等效ppm上限(可由小程序经BLE下发修改)
 
 // 震动检测参数
 /* 阈值含义: 相邻两次采样(约100ms)间的加速度变化量, 单位LSB。
- * ACCEL_CONFIG为±2g量程(16384 LSB/g), 4096 LSB = 0.25g ——
- * 手碰/挪动/小角度旋转(重力分量变化)均低于此值不再误报,
- * 机械冲击、持续晃动仍可靠触发; 嫌不灵敏可调低(旧值1400=0.085g) */
-uint16_t g_shake_threshold = 4096;
+ * ACCEL_CONFIG为±2g量程(16384 LSB/g), 8192 LSB = 0.5g ——
+ * 手碰/挪动/旋转以及桌面传导的冲击余振(通常<0.4g)都不再误报,
+ * 直接摇晃/敲击设备(>0.5g)仍可靠触发; 若误触发, 看串口
+ * "!!!VIBRATION DETECT!!! deltaAX..." 打印的实测值再微调阈值 */
+uint16_t g_shake_threshold = 8192;
 #define SHAKE_CNT         3        // 连续N次超限确认震动
 #define SHAKE_RELEASE_CNT 5        // 震动消失后再等5个周期解除锁存
 
