@@ -20,7 +20,8 @@
  * 前提（不满足时 start() 会明确报错）：
  *   「华为云」页(cloud)已配置 IAM 账号 / projectId / deviceId / iotBase
  *   接入地址，且设备在线、影子有数据（产品模型须含服务 show 与属性
- *   temp/humi/gas，与 STM32 上报 payload 一致）。
+ *   temp/humi/gas/fan/alarm，v2.1 起还要 helmet/head 才会进影子——
+ *   华为云只存储产品模型里定义过的属性，未定义的上报字段会被平台丢弃）。
  * ==================================================================
  */
 
@@ -91,6 +92,10 @@ function parseShadowToRecord(shadowArr) {
     // (否则华为云通道会一直显示风扇关闭、无告警类型)
     const fanRaw = pick(['fan', 'Fan'])
     const alarmRaw = pick(['alarm', 'Alarm'])
+    // v2.1 协议字段：K230 安全帽人数(STM32 经 UART4 收到后随属性一并上报),
+    // 影子里有才带上 -> 首页安全帽卡片才会在云通道下显示
+    const helmetRaw = pick(['helmet', 'Helmet'])
+    const headRaw = pick(['head', 'Head'])
 
     // temp/humi/gas 必须全部有效才认为是一帧完整数据
     if (!isFinite(temp) || !isFinite(humi) || !isFinite(gas)) continue
@@ -109,10 +114,16 @@ function parseShadowToRecord(shadowArr) {
     }
     const fan = isFinite(fanRaw) ? (fanRaw ? 1 : 0) : 0
 
+    // v2.1: 安全帽人数(0~99), 影子缺字段时不带 -> parseSensorJson 视为未接入
+    const clamp99 = (v) => Math.max(0, Math.min(99, Math.floor(v)))
+
     // 拼成标准传感器 JSON, 交给公共解析函数做校验/取整/打时间戳
-    const json = '{"temp":' + temp + ',"humi":' + humi +
+    let json = '{"temp":' + temp + ',"humi":' + humi +
       ',"gas":' + gas + ',"status":' + status +
-      ',"fan":' + fan + ',"alarm":' + alarm + '}'
+      ',"fan":' + fan + ',"alarm":' + alarm
+    if (isFinite(helmetRaw)) json += ',"helmet":' + clamp99(helmetRaw)
+    if (isFinite(headRaw)) json += ',"head":' + clamp99(headRaw)
+    json += '}'
     return parseSensorJson(json)
   }
   return null
