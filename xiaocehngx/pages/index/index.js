@@ -34,6 +34,11 @@ Page({
     statusDanger: false,  // true 时整张卡片显示红色
     lastTime: '--:--:--', // 最近一帧数据到达时间
 
+    /* ---------------- 安全帽检测（v2.1 协议，K230 经 STM32 转发） ---------------- */
+    k230Available: false, // 固件带上 helmet/head 字段才显示该卡片
+    helmet: 0,            // 戴安全帽人数
+    head: 0,              // 未戴安全帽人数
+
     /* ---------------- 连接状态栏 ---------------- */
     modeText: '未连接',   // 当前通道：蓝牙 / 华为云 / 未连接
     connected: false,
@@ -148,6 +153,9 @@ Page({
     const fan = record.fan === 1 ? 1 : 0
     const fanOn = fan === 1
 
+    // 安全帽人数：v2.1 协议可选字段，两个字段都有才认为 K230 已接入
+    const k230Available = typeof record.helmet === 'number' && typeof record.head === 'number'
+
     this.setData({
       temp: record.temp.toFixed(1),
       humi: record.humi.toFixed(1),
@@ -157,6 +165,10 @@ Page({
       fanOn: fanOn,
       fanText: fanOn ? '运行中' : '关闭',
       fanTip: fanOn ? '设备已自动启动散热' : '设备自动控制',
+
+      k230Available: k230Available,
+      helmet: k230Available ? record.helmet : 0,
+      head: k230Available ? record.head : 0,
 
       status: record.status,
       alarm: alarm,

@@ -30,7 +30,8 @@
 //#define PublishTopic_web   "/k2877qwTkuz/shebei32/user/update" //发布的主题
 
 //去掉LED2，新增gas；v2 协议额外带 fan 和 alarm 告警位掩码
-#define MQTTPUBLISH(temp, humi, gas, fan, alarm)"{\"services\":[{\"service_id\":\"show\",\"properties\":{\"humi\":%f,\"temp\":%f,\"gas\":%f,\"fan\":%d,\"alarm\":%d},\"event_time\":\"20151212T121212Z\"}]}",humi,temp,gas,fan,alarm
+//v2.1 再加 helmet/head: K230 安全帽检测人数(经UART4送入STM32)
+#define MQTTPUBLISH(temp, humi, gas, fan, alarm, helmet, head)"{\"services\":[{\"service_id\":\"show\",\"properties\":{\"humi\":%f,\"temp\":%f,\"gas\":%f,\"fan\":%d,\"alarm\":%d,\"helmet\":%d,\"head\":%d},\"event_time\":\"20151212T121212Z\"}]}",humi,temp,gas,fan,alarm,helmet,head
 
 void MQTT_Clear(void);
 void MQTT_SendData(uint8_t* buf,uint16_t len);
@@ -38,7 +39,7 @@ void MQTT_SendHeart(void);
 void MQTT_Init(void);
 void MQTT_Connect(void);
 void MQTT_Disconnect(void);
-void MQTT_PublicTopic(float humi,float temp, float gas, uint8_t fan, uint8_t alarm);
+void MQTT_PublicTopic(float humi,float temp, float gas, uint8_t fan, uint8_t alarm, uint8_t helmet, uint8_t head);
 //void MQTT_PublicTopic_web(float temp,float humi, bool LED2);
 void MQTT_SubscribeTopic(void);
 void MQTT_SubscribeTopic_web(void);

@@ -29,10 +29,24 @@ void BT24_PinsSafe(void);                                             /* 上电�
 void USART2_Config(uint32_t baud);                                   /* 蓝牙串口初始化 */
 void BT24_SendString(char *str);                                     /* 蓝牙发送字符串 */
 void BT24_SendFrame(float temp, float humi, float gas,
-                    uint8_t status, uint8_t fan, uint8_t alarm); /* 按协议发送JSON帧 (v2: +fan+alarm) */
+                    uint8_t status, uint8_t fan, uint8_t alarm,
+                    uint8_t helmet, uint8_t head); /* 按协议发送JSON帧 (v2.1: +helmet+head) */
 
 extern volatile uint8_t  bt24_rx_done;   /* 收到一帧(空闲中断置1), 处理后手动清0 */
 extern volatile uint16_t bt24_rx_len;    /* 本帧长度 */
 extern char bt24_rx_buf[BT24_RX_BUF_SIZE]; /* 接收缓冲区 */
+
+/* ---------------- UART4 + K230 安全帽检测板 ---------------- */
+/* 接线: K230 TX(pin11) -> STM32 PC11(UART4_RX)
+ *       K230 RX(pin12) -> STM32 PC10(UART4_TX, 只收不发可不接)
+ *       两侧GND必须共地; 均为3.3V电平, 可直连
+ * K230 helmet_inference.py 每帧输出一行: "helmet:2,head:1\r\n" @115200
+ * (在接收中断里就地解析, 不占用主循环) */
+void UART4_Config(uint32_t baud);          /* K230 串口初始化 */
+
+extern volatile uint8_t  k230_helmet_cnt;  /* 最新一帧: 戴安全帽人数 */
+extern volatile uint8_t  k230_head_cnt;    /* 最新一帧: 未戴安全帽人数 */
+extern volatile uint16_t k230_silence;     /* 距上次收到K230数据的主循环轮数(100ms/轮) */
+#define K230_TIMEOUT_ROUNDS  50            /* 超5秒没收到 -> 视为K230离线 */
 
 #endif

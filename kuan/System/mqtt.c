@@ -138,12 +138,12 @@ void MQTT_Disconnect(void)
  * @return 没有返回参数
  */
 //void MQTT_PublicTopic(float temp,float humi)
-void MQTT_PublicTopic(float humi, float temp, float gas, uint8_t fan, uint8_t alarm)
+void MQTT_PublicTopic(float humi, float temp, float gas, uint8_t fan, uint8_t alarm, uint8_t helmet, uint8_t head)
 {
 	char SendData[512];
 	MQTT_Clear();
 	uint8_t MQTT_PublishTopic_Len = strlen(PublishTopic);
-	sprintf(SendData,MQTTPUBLISH(temp, humi, gas, fan, alarm));
+	sprintf(SendData,MQTTPUBLISH(temp, humi, gas, fan, alarm, helmet, head));
 	uint8_t MQTT_MQTTPUBLISH_Len = strlen(SendData);
 
 	MQTT_RX_BUF[MQTT_Len++] = 0x30;  //固定的报头

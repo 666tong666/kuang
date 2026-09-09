@@ -1,0 +1,27 @@
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\KEIL\ARM\ARMCC\Bin'
+Build target 'STM10'
+compiling main.c...
+..\Driver\LED.h(23): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Driver\BEEP.h(9): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Driver\oled.h(34): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Driver\mq135.h(10): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Driver\mpu6050.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Driver\green.h(9): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Driver\motor.h(19): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Driver\fan.h(54): warning:  #1-D: last line of file ends without a newline
+  #endif /* __FAN_H */
+..\User\main.c(411): warning:  #1-D: last line of file ends without a newline
+  }
+..\User\main.c: 9 warnings, 0 errors
+linking...
+Program Size: Code=22016 RO-data=4444 RW-data=96 ZI-data=4512  
+FromELF: creating hex file...
+".\Objects\STM.axf" - 0 Error(s), 9 Warning(s).
+Build Time Elapsed:  00:00:02

@@ -14,6 +14,9 @@
  *             bit1 = 气体超标 (gas > gas_max)
  *             bit2 = 震动告警 (shake)
  *           多类可同时置位（如 0b011 = 温度+气体同时告警）
+ *   helmet 戴安全帽人数 0~99（v2.1 新增，可选；K230 经 UART4 送入 STM32，
+ *         缺省 undefined 表示固件未接入 K230，UI 隐藏安全帽卡片）
+ *   head   未戴安全帽人数 0~99（v2.1 新增，可选，同上）
  * ==================================================================
  * 本模块刻意把「蓝牙接收解析函数」与「MQTT 接收解析函数」分开实现：
  *   parseBlePayload(buffer)  —— BLE 通道（需处理 ArrayBuffer、半包粘包）
@@ -132,6 +135,20 @@ function parseSensorJson(str) {
       // alarm 留 0，由 UI 显示 "危险告警" 但不带具体类型标签
     }
 
+    // ---------- 可选字段（v2.1 协议，K230 安全帽检测，缺省=固件未接入） ----------
+    // helmet: 戴安全帽人数 0~99；head: 未戴安全帽人数 0~99
+    // 越界/非数值视为未上报（保持 undefined），UI 据此隐藏安全帽卡片
+    let helmet
+    let head
+    if (obj.helmet !== undefined) {
+      const hv = Number(obj.helmet)
+      if (isFinite(hv) && hv >= 0 && hv <= 99) helmet = Math.floor(hv)
+    }
+    if (obj.head !== undefined) {
+      const hv = Number(obj.head)
+      if (isFinite(hv) && hv >= 0 && hv <= 99) head = Math.floor(hv)
+    }
+
     // ---------- 校验通过，组装标准记录 ----------
     const now = new Date()
     const pad = (n) => (n < 10 ? '0' + n : '' + n)
@@ -143,6 +160,8 @@ function parseSensorJson(str) {
       status: status,                     // 井下状态 0/1（兼容旧协议）
       fan: fan,                           // 风扇 0/1（v2）
       alarm: alarm,                       // 告警位掩码 0~7（v2）
+      helmet: helmet,                     // 戴安全帽人数（v2.1 可选，缺省 undefined）
+      head: head,                         // 未戴安全帽人数（v2.1 可选，缺省 undefined）
       time: `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
       ts: now.getTime(),                  // 毫秒时间戳
       id: `${now.getTime()}_${Math.floor(Math.random() * 10000)}` // 唯一 id（避免重复 key）

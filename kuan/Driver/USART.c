@@ -96,8 +96,106 @@ void BT24_SendString(char *str)
     Usart_SendString(USART2, str);
 }
 
-/* 按小程序协议发送一帧JSON (docs/STM32数据上报协议.md, v2):
- * {"temp":25.0,"humi":60.0,"gas":110,"status":0,"fan":0,"alarm":0}\n
+/* ============================================================
+ *  UART4 + K230 CanMV 安全帽检测板 (PC10-TX / PC11-RX)
+ *  K230 每帧输出一行 "helmet:2,head:1\r\n" @115200,
+ *  在中断里逐行解析出人数, 主循环只读 k230_helmet_cnt/k230_head_cnt
+ * ============================================================ */
+volatile uint8_t  k230_helmet_cnt = 0;
+volatile uint8_t  k230_head_cnt   = 0;
+volatile uint16_t k230_silence    = 0;
+
+void UART4_Config(uint32_t baud)
+{
+    GPIO_InitTypeDef  GPIO_InitStructure;
+    USART_InitTypeDef USART_InitStructure;
+    NVIC_InitTypeDef  NVIC_InitStructure;
+
+    /* 1. 开时钟: GPIOC(AHB1) + UART4(APB1) */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
+
+    /* 2. PC10/PC11 复用为 UART4 (AF8) */
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_UART4);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_UART4);
+
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_10 | GPIO_Pin_11;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    /* 3. 基本参数 (与K230端UART_BAUDRATE一致: 115200 8N1) */
+    USART_InitStructure.USART_BaudRate            = baud;
+    USART_InitStructure.USART_WordLength           = USART_WordLength_8b;
+    USART_InitStructure.USART_StopBits             = USART_StopBits_1;
+    USART_InitStructure.USART_Parity               = USART_Parity_No;
+    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    USART_InitStructure.USART_Mode                 = USART_Mode_Rx | USART_Mode_Tx;
+    USART_Init(UART4, &USART_InitStructure);
+
+    /* 4. 接收中断 + 空闲中断 */
+    NVIC_InitStructure.NVIC_IRQChannel                   = UART4_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 3;
+    NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
+    USART_ITConfig(UART4, USART_IT_IDLE, ENABLE);
+
+    /* 5. 使能 UART4 */
+    USART_Cmd(UART4, ENABLE);
+}
+
+/* UART4 接收中断: 按\n断行, 行内就地sscanf出人数
+ * K230 每秒发十几行、每行不到20字节, 在168MHz主频下中断内解析开销可忽略;
+ * 解析失败(如开机自测"uart ok")直接丢弃 */
+void UART4_IRQHandler(void)
+{
+    static char line[32];
+    static uint8_t idx = 0;
+
+    if (USART_GetITStatus(UART4, USART_IT_RXNE) == SET)
+    {
+        char d = (char)USART_ReceiveData(UART4);
+        if (d == '\n')
+        {
+            int h, s;
+            line[idx] = '\0';
+            if (sscanf(line, "helmet:%d,head:%d", &h, &s) == 2)
+            {
+                if (h < 0) h = 0;   /* 人数限幅, 防异常值溢出uint8_t */
+                if (s < 0) s = 0;
+                if (h > 99) h = 99;
+                if (s > 99) s = 99;
+                k230_helmet_cnt = (uint8_t)h;
+                k230_head_cnt   = (uint8_t)s;
+                k230_silence    = 0;    /* 喂狗: 证明K230活着 */
+            }
+            idx = 0;
+        }
+        else if (d != '\r')
+        {
+            if (idx < sizeof(line) - 1)
+            {
+                line[idx++] = d;
+            }
+            else
+            {
+                idx = 0;               /* 超长行丢弃, 重新同步 */
+            }
+        }
+    }
+    if (USART_GetITStatus(UART4, USART_IT_IDLE) == SET)
+    {
+        USART_ReceiveData(UART4);      /* 读DR清除IDLE标志 */
+    }
+}
+
+/* 按小程序协议发送一帧JSON (docs/STM32数据上报协议.md, v2.1):
+ * {"temp":25.0,"humi":60.0,"gas":110,"status":0,"fan":0,"alarm":0,"helmet":2,"head":1}\n
  * 手机连上BT24后, 串口写什么手机notify就收到什么
  *
  * @param temp   温度 ℃
@@ -106,14 +204,19 @@ void BT24_SendString(char *str)
  * @param status 0/1（兼容旧协议）；=1 表示存在任一告警
  * @param fan    0/1 当前风扇状态
  * @param alarm  0~7 告警位掩码 (bit0温度 / bit1气体 / bit2震动)
+ * @param helmet K230识别: 戴安全帽人数 (v2.1新增, 小程序缺省忽略)
+ * @param head   K230识别: 未戴安全帽人数
  */
 void BT24_SendFrame(float temp, float humi, float gas,
-                    uint8_t status, uint8_t fan, uint8_t alarm)
+                    uint8_t status, uint8_t fan, uint8_t alarm,
+                    uint8_t helmet, uint8_t head)
 {
     char buf[128];
     int len = snprintf(buf, sizeof(buf),
-        "{\"temp\":%.1f,\"humi\":%.1f,\"gas\":%d,\"status\":%d,\"fan\":%d,\"alarm\":%d}\n",
-        temp, humi, (int)(gas + 0.5f), status, fan ? 1 : 0, alarm & 0x07);
+        "{\"temp\":%.1f,\"humi\":%.1f,\"gas\":%d,\"status\":%d,\"fan\":%d,"
+        "\"alarm\":%d,\"helmet\":%d,\"head\":%d}\n",
+        temp, humi, (int)(gas + 0.5f), status, fan ? 1 : 0, alarm & 0x07,
+        helmet, head);
     if (len > 0)
     {
         Usart_SendBytes(USART2, (uint8_t *)buf, (uint32_t)len);

@@ -218,6 +218,7 @@ int main(void)
     OLED_Init();
     OLED_Clear();
 	UART3_Config(115200);
+    UART4_Config(115200);   /* PC10/PC11 -> K230 安全帽检测板 */
 	
 	//开机画面提示
     OLED_ShowString(1, 1, "Sys Initializing");
@@ -243,7 +244,8 @@ int main(void)
 
     while(1)
     {
-		mqtt_cnt++;		
+		mqtt_cnt++;
+        if(k230_silence < 60000) k230_silence++;   /* K230接收中断清0; 用于离线判断 */
         // --- 1. 读取传感器数据 ---
         
         // DHT11读取 (约每200ms读一次)
@@ -321,12 +323,16 @@ int main(void)
 			/* 风扇状态跟随告警：温度或气体任一超标 -> 开(显示), 否则关 */
 			uint8_t fan = (temp_val > TEMP_MAX || gas_val > gas_max) ? 1 : 0;
 			if (fan) Fan_On(); else Fan_Off();
-			/* MQTT上报 (v2: humi, temp, gas, fan, alarm) */
-			MQTT_PublicTopic(humi_val, temp_val, gas_val, fan, alarm);
-			printf("MQTT upload: temp=%.1f humi=%.1f gas=%.1f fan=%u alarm=%u\r\n",
-			       temp_val, humi_val, gas_val, fan, alarm);
-			/* BLE透传 (v2: +fan+alarm) */
-			BT24_SendFrame(temp_val, humi_val, gas_val, status, fan, alarm);
+			/* K230 安全帽人数 (UART4中断更新; K230离线时冻结在最后一帧数值,
+			 * 是否离线看OLED第4行的 H:-U:- 提示) */
+			uint8_t helmet = k230_helmet_cnt;
+			uint8_t head   = k230_head_cnt;
+			/* MQTT上报 (v2.1: +helmet+head) */
+			MQTT_PublicTopic(humi_val, temp_val, gas_val, fan, alarm, helmet, head);
+			printf("MQTT upload: temp=%.1f humi=%.1f gas=%.1f fan=%u alarm=%u helmet=%u head=%u\r\n",
+			       temp_val, humi_val, gas_val, fan, alarm, helmet, head);
+			/* BLE透传 (v2.1: +helmet+head) */
+			BT24_SendFrame(temp_val, humi_val, gas_val, status, fan, alarm, helmet, head);
 		}
 
         // 当前温度浮点数（方便比较）
@@ -382,6 +388,21 @@ int main(void)
         else
         {
             OLED_ShowMixedString(4, 6, "正常");         /* 正/常 = col 6~9 */
+        }
+
+        // 第4行右侧: K230安全帽人数 H:戴帽 U:未戴 (col 11~16, 离线显示--)
+        if(k230_silence <= K230_TIMEOUT_ROUNDS)
+        {
+            uint8_t h_show = (k230_helmet_cnt > 9) ? 9 : k230_helmet_cnt;
+            uint8_t u_show = (k230_head_cnt   > 9) ? 9 : k230_head_cnt;
+            OLED_ShowString(4, 11, "H:");
+            OLED_ShowNum(4, 13, h_show, 1);
+            OLED_ShowString(4, 14, "U:");
+            OLED_ShowNum(4, 16, u_show, 1);
+        }
+        else
+        {
+            OLED_ShowString(4, 11, "H:-U:-");
         }
 
         // 循环延时 100ms

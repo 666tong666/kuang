@@ -107,6 +107,28 @@
     </view>
   </view>
 
+  <!-- ============ K230 安全帽检测卡片（v2.1 可选字段，固件未接入时隐藏） ============ -->
+  <view class="card" wx:if="{{k230Available}}">
+    <view class="card-title">
+      <text>安全帽检测</text>
+      <text class="status-tag {{head > 0 ? 'status-tag-danger' : 'status-tag-ok'}}">{{head > 0 ? '有人未戴帽' : '全部合规'}}</text>
+    </view>
+    <view class="helmet-row">
+      <view class="helmet-item">
+        <text class="helmet-num helmet-num-ok">{{helmet}}</text>
+        <text class="helmet-label">戴安全帽</text>
+      </view>
+      <view class="helmet-item">
+        <text class="helmet-num {{head > 0 ? 'helmet-num-danger' : ''}}">{{head}}</text>
+        <text class="helmet-label">未戴安全帽</text>
+      </view>
+      <view class="helmet-item helmet-item-sum">
+        <text class="helmet-num helmet-num-sum">{{helmet + head}}</text>
+        <text class="helmet-label">检测人数</text>
+      </view>
+    </view>
+  </view>
+
   <!-- ============ 气体告警阈值设置卡片 ============ -->
   <view class="card">
     <view class="card-title">气体告警阈值设置</view>
