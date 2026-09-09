@@ -117,6 +117,9 @@ uint8_t MPU6050_VibrationDetect(int16_t ax, int16_t ay, int16_t az)
             {
                 vib_latch = 0;
                 release_timer = 0;
+                shake_pending = 0;   /* 事件已结束: 若粘性标志还没被上报取走,
+                                        说明它与上一帧属同一次震动, 丢弃之,
+                                        以免拖慢"恢复正常"帧的发出 */
             }
         }
     }
@@ -256,6 +259,7 @@ int main(void)
     uint8_t dht_tick = 0;
     uint8_t shake_flag = 0;
 	static uint16_t mqtt_cnt = 0;
+	static uint8_t last_alarm_sent = 0;   /* 最近一帧上报的告警位掩码, 用于事件驱动补发 */
 
     // 1.系统基础配置
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
@@ -367,6 +371,19 @@ int main(void)
             key0_hold_ms = 0;
         }
 		
+		/* 事件驱动上报: 告警状态(温度/气体/震动)变化时, 距上一帧≥200ms就补发,
+		 * 让小程序端告警出现与恢复都在1~2秒内可见, 不必等下一个5s周期 */
+		{
+			uint8_t now_alarm = 0;
+			if (temp_int + temp_deci / 10.0f > TEMP_MAX) now_alarm |= 0x01;
+			if (nh3_ppm > gas_max)                       now_alarm |= 0x02;
+			if (shake_flag || shake_pending)             now_alarm |= 0x04;
+			if (now_alarm != last_alarm_sent && mqtt_cnt >= 2)
+			{
+				mqtt_cnt = 5;    /* 强制触发下方上报块 */
+			}
+		}
+
 		if(mqtt_cnt >= 5)   //50*100ms =5s上报一次
 		{
 			mqtt_cnt = 0;
@@ -384,6 +401,7 @@ int main(void)
 			if (temp_val > TEMP_MAX)   alarm |= 0x01;  /* bit0 温度过高 */
 			if (gas_val  > gas_max)    alarm |= 0x02;  /* bit1 气体超标 */
 			if (shake_report)          alarm |= 0x04;  /* bit2 震动告警 */
+			last_alarm_sent = alarm;   /* 记录已发状态, 供事件驱动比较 */
 			/* 风扇状态跟随告警：温度或气体任一超标 -> 开(显示), 否则关 */
 			uint8_t fan = (temp_val > TEMP_MAX || gas_val > gas_max) ? 1 : 0;
 			if (fan) Fan_On(); else Fan_Off();
