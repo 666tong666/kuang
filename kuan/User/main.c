@@ -60,6 +60,10 @@ uint16_t g_shake_threshold = 8192;
  * 解决锁存仅维持约0.5s、短震动落在两次上报之间被漏掉的问题 */
 uint8_t shake_pending = 0;
 
+/* MPU6050 串口诊断开关: 1=每100ms打印原始值/差值/状态(排查误触发用),
+ * 排查完改0关闭。输出约600字节/秒, 115200波特率无压力 */
+#define MPU_DEBUG_PRINT 1
+
 /**
  * @brief  MPU6050震动检测函数
  * @param  ax,ay,az 当前原始加速度计数值
@@ -97,11 +101,16 @@ uint8_t MPU6050_VibrationDetect(int16_t ax, int16_t ay, int16_t az)
     {
         cnt++;
         release_timer = 0;
+#if MPU_DEBUG_PRINT
+        /* 打印每个超限采样: 看差值多大、是否连续凑满SHAKE_CNT */
+        printf("[MPU] over! dx=%d dy=%d dz=%d (thr=%u) cnt=%d/%d\r\n",
+               delta_ax, delta_ay, delta_az, g_shake_threshold, cnt, SHAKE_CNT);
+#endif
         if(cnt >= SHAKE_CNT)
         {
             if(vib_latch == 0)
             {
-                printf("!!!VIBRATION DETECT!!! deltaAX:%d deltaAY:%d deltaAZ:%d \r\n",delta_ax,delta_ay,delta_az);
+                printf("[MPU] !!! SHAKE LATCH ON !!!\r\n");
             }
             vib_latch = 1;
             shake_pending = 1;    /* 粘性置位, 直到被上报流程取走 */
@@ -120,6 +129,9 @@ uint8_t MPU6050_VibrationDetect(int16_t ax, int16_t ay, int16_t az)
                 shake_pending = 0;   /* 事件已结束: 若粘性标志还没被上报取走,
                                         说明它与上一帧属同一次震动, 丢弃之,
                                         以免拖慢"恢复正常"帧的发出 */
+#if MPU_DEBUG_PRINT
+                printf("[MPU] shake latch released\r\n");
+#endif
             }
         }
     }
@@ -322,6 +334,12 @@ int main(void)
         // MPU6050 读取三轴加速度并调用你的震动检测算法
         MPU6050_ReadAll(&ax, &ay, &az, &gx, &gy, &gz);
         shake_flag = MPU6050_VibrationDetect(ax, ay, az);
+#if MPU_DEBUG_PRINT
+        /* 原始值诊断: 平放静止时 az约±16384(1g重力), ax/ay接近0;
+         * 若数值无外部触碰却大幅跳变, 多为I2C读数毛刺或供电干扰 */
+        printf("[MPU] ax=%d ay=%d az=%d lat=%d pend=%d\r\n",
+               ax, ay, az, shake_flag, shake_pending);
+#endif
 
         // MQ135 气体浓度计算: 16次均值滤波 + 温湿度修正 + 校准后的R0
         adc_val = MQ135_Get_ADC_Avg(16);
