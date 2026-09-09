@@ -1,0 +1,125 @@
+<!--pages/index/index.wxml —— 实时监测页
+     工业简洁风格：5 个数据卡片实时展示温度/湿度/有害气体/风扇/井下状态
+     井下状态：正常=绿色，危险告警=红色，并按 alarm 位掩码列出具体类型 -->
+
+<view class="page">
+
+  <!-- ============ 顶部连接状态栏 ============ -->
+  <view class="conn-bar {{connected ? 'conn-bar-on' : ''}}">
+    <view class="conn-dot {{connected ? 'conn-dot-on' : ''}}"></view>
+    <text class="conn-text">{{connected ? '数据通道：' + modeText : '未连接设备'}}</text>
+    <text class="conn-time">更新 {{lastTime}}</text>
+  </view>
+
+  <!-- ============ 数据卡片：4 个常规 + 1 个风扇 ============ -->
+  <view class="grid">
+
+    <!-- 温度卡片 -->
+    <view class="data-card">
+      <view class="data-head">
+        <text class="data-icon">🌡</text>
+        <text class="data-name">温度</text>
+      </view>
+      <view class="data-body">
+        <text class="data-value {{alarmTemp ? 'text-danger' : ''}}">{{temp}}</text>
+        <text class="data-unit">℃</text>
+      </view>
+    </view>
+
+    <!-- 湿度卡片 -->
+    <view class="data-card">
+      <view class="data-head">
+        <text class="data-icon">💧</text>
+        <text class="data-name">湿度</text>
+      </view>
+      <view class="data-body">
+        <text class="data-value">{{humi}}</text>
+        <text class="data-unit">%RH</text>
+      </view>
+    </view>
+
+    <!-- 有害气体浓度卡片 -->
+    <view class="data-card">
+      <view class="data-head">
+        <text class="data-icon">☠</text>
+        <text class="data-name">有害气体</text>
+      </view>
+      <view class="data-body">
+        <text class="data-value {{alarmGas ? 'text-danger' : (statusDanger || gas > threshold ? 'text-danger' : '')}}">{{gas}}</text>
+        <text class="data-unit">ppm</text>
+      </view>
+      <view class="data-foot">
+        <text class="data-tip">阈值 {{threshold}}ppm</text>
+      </view>
+    </view>
+
+    <!-- 风扇状态卡片 -->
+    <view class="data-card {{fanOn ? 'data-card-fan-on' : ''}}">
+      <view class="data-head">
+        <text class="data-icon">💨</text>
+        <text class="data-name">散热风扇</text>
+      </view>
+      <view class="data-body">
+        <text class="data-status {{fanOn ? 'text-ok' : 'text-mute'}}">{{fanText}}</text>
+      </view>
+      <view class="data-foot">
+        <text class="data-tip">{{fanTip}}</text>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- ============ 井下状态卡片（独占一行，按 alarm 位掩码列出具体类型） ============ -->
+  <view class="card status-card {{statusDanger ? 'status-card-danger' : ''}}">
+    <view class="card-title">
+      <text>井下状态</text>
+      <text class="status-tag {{statusDanger ? 'status-tag-danger' : 'status-tag-ok'}}">{{statusText}}</text>
+    </view>
+
+    <!-- 正常态：显示简单提示 -->
+    <view wx:if="{{!statusDanger}}" class="status-body-ok">
+      <text class="status-ok-text">✓ 当前各项指标在安全范围内</text>
+    </view>
+
+    <!-- 危险态：列出具体触发的告警类型（按 alarm 位掩码渲染） -->
+    <view wx:else class="status-body-danger">
+      <view wx:if="{{alarmTemp}}" class="alarm-row">
+        <text class="alarm-icon">🌡</text>
+        <text class="alarm-name">温度过高</text>
+        <text class="alarm-detail">{{temp}} ℃ 超阈值</text>
+      </view>
+      <view wx:if="{{alarmGas}}" class="alarm-row">
+        <text class="alarm-icon">☠</text>
+        <text class="alarm-name">有害气体超标</text>
+        <text class="alarm-detail">{{gas}} ppm 超阈值</text>
+      </view>
+      <view wx:if="{{alarmShake}}" class="alarm-row">
+        <text class="alarm-icon">📳</text>
+        <text class="alarm-name">震动告警</text>
+        <text class="alarm-detail">检测到异常震动</text>
+      </view>
+      <!-- 兼容旧固件：只发 status=1、没带 alarm 时显示模糊提示 -->
+      <view wx:if="{{!alarmTemp && !alarmGas && !alarmShake}}" class="alarm-row">
+        <text class="alarm-icon">⚠</text>
+        <text class="alarm-name">井下异常</text>
+        <text class="alarm-detail">固件未上报具体告警类型</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 气体告警阈值设置卡片 ============ -->
+  <view class="card">
+    <view class="card-title">气体告警阈值设置</view>
+    <view class="th-row">
+      <input
+        class="th-input"
+        type="digit"
+        value="{{thresholdInput}}"
+        placeholder="输入阈值（ppm）"
+        bindinput="onThresholdInput" />
+      <view class="btn btn-dark th-btn" bindtap="saveThreshold">保存</view>
+    </view>
+    <view class="th-tip">说明：气体浓度超过该阈值，或设备上报 status=1 时，将弹窗告警并震动提醒</view>
+  </view>
+
+</view>

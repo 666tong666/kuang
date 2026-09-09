@@ -1,0 +1,120 @@
+/* pages/history/history.wxss —— 历史数据页样式（工业简洁风格） */
+
+.page {
+  padding-bottom: 40rpx;
+}
+
+/* ==================== 顶部统计栏 ==================== */
+.stat-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #FFFFFF;
+  padding: 20rpx 30rpx;
+  border-bottom: 4rpx solid #E0E4E8;
+}
+.stat-text {
+  font-size: 26rpx;
+  color: #5A646C;
+  font-family: "Courier New", monospace;
+}
+
+/* 清空按钮（小号红色描边风格） */
+.btn-danger-sm {
+  background-color: #FFFFFF;
+  color: #D32F2F;
+  border: 2rpx solid #D32F2F;
+  font-size: 24rpx;
+  padding: 8rpx 24rpx;
+  border-radius: 8rpx;
+}
+
+/* ==================== 历史列表 ==================== */
+.list {
+  padding: 12rpx 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFF;
+  border-radius: 10rpx;
+  margin: 12rpx 24rpx;
+  padding: 20rpx 24rpx;
+  box-shadow: 0 2rpx 6rpx rgba(38, 50, 56, 0.05);
+}
+
+/* 左列：时间 */
+.row-time {
+  width: 130rpx;
+  display: flex;
+  flex-direction: column;
+}
+.row-clock {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #263238;
+  font-family: "Courier New", monospace;
+}
+.row-index {
+  font-size: 20rpx;
+  color: #9AA2A9;
+  margin-top: 6rpx;
+}
+
+/* 中列：三个测量值 */
+.row-values {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+}
+.v-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.v-label {
+  font-size: 20rpx;
+  color: #9AA2A9;
+  margin-bottom: 6rpx;
+}
+.v-num {
+  font-size: 26rpx;
+  color: #263238;
+  font-family: "Courier New", monospace;
+  font-weight: 600;
+}
+
+/* 右列：状态徽标 */
+.row-status {
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 8rpx 20rpx;
+  border-radius: 6rpx;
+}
+.badge-ok {
+  color: #2E7D32;
+  background-color: #EAF3EB;
+  border: 2rpx solid #2E7D32;
+}
+.badge-danger {
+  color: #D32F2F;
+  background-color: #FDECEA;
+  border: 2rpx solid #D32F2F;
+}
+
+/* ==================== 空状态 ==================== */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 40rpx;
+  color: #B0B7BD;
+  font-size: 28rpx;
+}
+.empty-sub {
+  font-size: 22rpx;
+  margin-top: 16rpx;
+  text-align: center;
+  line-height: 1.6;
+}

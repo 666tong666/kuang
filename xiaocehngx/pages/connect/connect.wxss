@@ -1,0 +1,144 @@
+/* pages/connect/connect.wxss —— 蓝牙连接页 */
+
+/* ========== 页面容器 ========== */
+.page {
+  padding: 32rpx 28rpx;
+  padding-bottom: 80rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ========== 状态卡片 ========== */
+.status-card {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 36rpx 32rpx;
+  margin-bottom: 36rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border-left: 8rpx solid #CFD8DC;
+  transition: border-left-color 0.2s ease;
+}
+.status-card.status-on {
+  border-left-color: #F57C00;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.status-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #B0BEC5;
+  margin-right: 16rpx;
+  transition: all 0.2s ease;
+}
+.status-dot.status-dot-on {
+  background: #F57C00;
+  box-shadow: 0 0 0 6rpx rgba(245, 124, 0, 0.2);
+}
+.status-main {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #263238;
+}
+.status-sub {
+  font-size: 24rpx;
+  color: #607D8B;
+  line-height: 1.5;
+  display: block;
+}
+
+/* ========== 按钮 ========== */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+.btn:active {
+  opacity: 0.85;
+  transform: scale(0.99);
+}
+.btn-dark {
+  background: #263238;
+  color: #FFFFFF;
+}
+.btn-outline {
+  background: #FFFFFF;
+  color: #D32F2F;
+  border: 2rpx solid #D32F2F;
+}
+.action-btn {
+  margin-top: 8rpx;
+}
+
+/* ========== 提示文字 ========== */
+.scan-tip {
+  font-size: 24rpx;
+  color: #90A4AE;
+  margin-top: 24rpx;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ========== 设备列表 ========== */
+.list {
+  margin-top: 40rpx;
+}
+.list-title {
+  font-size: 26rpx;
+  color: #455A64;
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
+}
+.device-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.03);
+  transition: transform 0.1s ease;
+}
+.device-item:active {
+  transform: scale(0.99);
+  background: #FAFAFA;
+}
+.device-info {
+  display: flex;
+  flex-direction: column;
+}
+.device-name {
+  font-size: 30rpx;
+  color: #263238;
+  font-weight: 600;
+}
+.device-id {
+  font-size: 22rpx;
+  color: #90A4AE;
+  margin-top: 4rpx;
+  font-family: monospace;
+}
+.device-rssi {
+  font-size: 24rpx;
+  color: #F57C00;
+  font-weight: 500;
+}
+
+/* ========== 空态 ========== */
+.empty {
+  margin-top: 40rpx;
+  text-align: center;
+  color: #90A4AE;
+  font-size: 26rpx;
+}

@@ -1,0 +1,280 @@
+digraph
+{
+    "\"0\"" [ label = var_2_2, shape = rectangle ]
+    "\"1\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,6,8400]</td></tr></table>>, shape = plain ]
+    "\"3\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_51</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,4,8400]</td></tr></table>>, shape = plain ]
+    "\"5\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,4,8400]</td></tr></table>>, shape = plain ]
+    "\"7\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_49</td><td port="P0">ddrIf</td><td port="P1">ddrIf</td></tr><tr><td colspan="4">u8[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"9\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Reshape()</td><td port="P0">input</td><td port="P1">i32[4]</td></tr><tr><td colspan="4">f32[1,1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"10\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Binary(BinaryOp.Sub)</td><td port="P0">f32[1,2,8400]</td><td port="P1">rhs</td></tr><tr><td colspan="4">f32[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"11\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Slice()</td><td port="P0">input</td><td port="P1">i64[1]</td><td port="P2">i64[1]</td><td port="P3">i64[1]</td><td port="P4">i32[1]</td></tr><tr><td colspan="7">f32[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"12\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_47</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,4,8400]</td></tr></table>>, shape = plain ]
+    "\"14\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_46</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,8400,4,16]</td></tr></table>>, shape = plain ]
+    "\"16\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Softmax()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[33600,16]</td></tr></table>>, shape = plain ]
+    "\"17\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_45</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[33600,16]</td></tr></table>>, shape = plain ]
+    "\"19\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 2)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,64,8400]</td></tr></table>>, shape = plain ]
+    "\"21\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_30</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,64,6400]</td></tr></table>>, shape = plain ]
+    "\"23\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_29</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,80,80]</td></tr></table>>, shape = plain ]
+    "\"25\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,96,80,80]</td></tr></table>>, shape = plain ]
+    "\"27\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_26</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"29\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"30\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,32,80,80], f32[1,32,80,80])</td></tr></table>>, shape = plain ]
+    "\"31\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_25</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,64,80,80]</td></tr></table>>, shape = plain ]
+    "\"33\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,192,80,80]</td></tr></table>>, shape = plain ]
+    "\"35\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_24</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,128,80,80]</td></tr></table>>, shape = plain ]
+    "\"37\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_23</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,128,40,40]</td></tr></table>>, shape = plain ]
+    "\"39\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,192,40,40]</td></tr></table>>, shape = plain ]
+    "\"41\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_20</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"43\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"44\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,64,40,40], f32[1,64,40,40])</td></tr></table>>, shape = plain ]
+    "\"45\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_19</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,40,40]</td></tr></table>>, shape = plain ]
+    "\"47\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,384,40,40]</td></tr></table>>, shape = plain ]
+    "\"49\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_18</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,256,40,40]</td></tr></table>>, shape = plain ]
+    "\"51\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_17</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,256,20,20]</td></tr></table>>, shape = plain ]
+    "\"53\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,512,20,20]</td></tr></table>>, shape = plain ]
+    "\"55\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_13</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"57\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,384,20,20]</td></tr></table>>, shape = plain ]
+    "\"59\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"60\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,128,20,20], f32[1,128,20,20])</td></tr></table>>, shape = plain ]
+    "\"61\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_11</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,256,20,20]</td></tr></table>>, shape = plain ]
+    "\"63\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_10</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,128,40,40]</td></tr></table>>, shape = plain ]
+    "\"65\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,256,40,40]</td></tr></table>>, shape = plain ]
+    "\"67\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"68\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,64,40,40], f32[1,64,40,40])</td></tr></table>>, shape = plain ]
+    "\"69\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_7</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,40,40]</td></tr></table>>, shape = plain ]
+    "\"71\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_6</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,80,80]</td></tr></table>>, shape = plain ]
+    "\"73\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,128,80,80]</td></tr></table>>, shape = plain ]
+    "\"75\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"76\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,32,80,80], f32[1,32,80,80])</td></tr></table>>, shape = plain ]
+    "\"77\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_3</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,64,80,80]</td></tr></table>>, shape = plain ]
+    "\"79\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_2</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,48,160,160]</td></tr></table>>, shape = plain ]
+    "\"81\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,48,160,160]</td></tr></table>>, shape = plain ]
+    "\"83\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,16,160,160]</td></tr></table>>, shape = plain ]
+    "\"84\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,16,160,160], f32[1,16,160,160])</td></tr></table>>, shape = plain ]
+    "\"85\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_0</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,32,160,160]</td></tr></table>>, shape = plain ]
+    "\"87\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,16,160,160]</td></tr></table>>, shape = plain ]
+    "\"88\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_1</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,16,160,160]</td></tr></table>>, shape = plain ]
+    "\"82\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"90\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"91\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_4</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"93\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_5</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"74\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td><td port="P3"></td></tr></table>>, shape = plain ]
+    "\"95\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"96\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_8</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"98\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_9</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"66\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td><td port="P3"></td></tr></table>>, shape = plain ]
+    "\"100\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"101\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_12</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"58\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"103\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_14</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"105\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_15</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"107\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_16</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"54\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td><td port="P3"></td></tr></table>>, shape = plain ]
+    "\"48\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td></tr></table>>, shape = plain ]
+    "\"109\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_21</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"111\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"112\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_22</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"40\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"34\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td></tr></table>>, shape = plain ]
+    "\"114\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_27</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"116\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"117\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_28</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,32,80,80]</td></tr></table>>, shape = plain ]
+    "\"26\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"119\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_37</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,64,1600]</td></tr></table>>, shape = plain ]
+    "\"121\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_36</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,128,40,40]</td></tr></table>>, shape = plain ]
+    "\"123\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,192,40,40]</td></tr></table>>, shape = plain ]
+    "\"125\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_33</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"127\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"128\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,64,40,40], f32[1,64,40,40])</td></tr></table>>, shape = plain ]
+    "\"129\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_32</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,40,40]</td></tr></table>>, shape = plain ]
+    "\"131\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,192,40,40]</td></tr></table>>, shape = plain ]
+    "\"133\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_31</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"132\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td></tr></table>>, shape = plain ]
+    "\"135\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_34</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"137\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"138\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_35</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,64,40,40]</td></tr></table>>, shape = plain ]
+    "\"124\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"140\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_44</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,64,400]</td></tr></table>>, shape = plain ]
+    "\"142\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_43</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,256,20,20]</td></tr></table>>, shape = plain ]
+    "\"144\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,384,20,20]</td></tr></table>>, shape = plain ]
+    "\"146\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_40</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"148\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"149\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Split()</td><td port="P0">input</td><td port="P1">i64</td><td port="P2">i64[2]</td></tr><tr><td colspan="5">(f32[1,128,20,20], f32[1,128,20,20])</td></tr></table>>, shape = plain ]
+    "\"150\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_39</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,256,20,20]</td></tr></table>>, shape = plain ]
+    "\"152\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 1)</td><td port="P0">inputs</td></tr><tr><td colspan="3">f32[1,384,20,20]</td></tr></table>>, shape = plain ]
+    "\"154\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_38</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"153\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td></tr></table>>, shape = plain ]
+    "\"156\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_41</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"158\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>GetItem()</td><td port="P0">input</td><td port="P1">i32</td></tr><tr><td colspan="4">f32[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"159\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_42</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,128,20,20]</td></tr></table>>, shape = plain ]
+    "\"145\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"20\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"161\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_48</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"163\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Slice()</td><td port="P0">input</td><td port="P1">i64[1]</td><td port="P2">i64[1]</td><td port="P3">i64[1]</td><td port="P4">i32[1]</td></tr><tr><td colspan="7">f32[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"164\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_50</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"166\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Binary(BinaryOp.Sub)</td><td port="P0">lhs</td><td port="P1">rhs</td></tr><tr><td colspan="4">f32[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"167\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Reshape()</td><td port="P0">input</td><td port="P1">i32[3]</td></tr><tr><td colspan="4">f32[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"6\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td></tr></table>>, shape = plain ]
+    "\"168\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_55</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">f32[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"170\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>Concat(Axis: 2)</td><td port="P0">inputs</td></tr><tr><td colspan="3">u8[1,2,8400]</td></tr></table>>, shape = plain ]
+    "\"172\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_52</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,2,6400]</td></tr></table>>, shape = plain ]
+    "\"174\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_53</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,2,1600]</td></tr></table>>, shape = plain ]
+    "\"176\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Call</td><td>func_54</td><td port="P0">ddrIf</td></tr><tr><td colspan="3">u8[1,2,400]</td></tr></table>>, shape = plain ]
+    "\"171\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td><td port="P2"></td></tr></table>>, shape = plain ]
+    "\"2\"" [ label = <<table border="0" cellborder="1" cellspacing="0"><tr><td>Tuple</td><td port="P0"></td><td port="P1"></td></tr></table>>, shape = plain ]
+
+    "\"0\"" -> "\"85\"":P0
+    "\"85\"" -> "\"84\"":P0
+    "\"84\"" -> "\"83\"":P0
+    "\"84\"" -> "\"87\"":P0
+    "\"87\"" -> "\"88\"":P0
+    "\"83\"" -> "\"82\"":P0
+    "\"87\"" -> "\"82\"":P1
+    "\"88\"" -> "\"82\"":P2
+    "\"82\"" -> "\"81\"":P0
+    "\"81\"" -> "\"79\"":P0
+    "\"79\"" -> "\"77\"":P0
+    "\"77\"" -> "\"76\"":P0
+    "\"76\"" -> "\"75\"":P0
+    "\"76\"" -> "\"90\"":P0
+    "\"90\"" -> "\"91\"":P0
+    "\"91\"" -> "\"93\"":P0
+    "\"75\"" -> "\"74\"":P0
+    "\"90\"" -> "\"74\"":P1
+    "\"91\"" -> "\"74\"":P2
+    "\"93\"" -> "\"74\"":P3
+    "\"74\"" -> "\"73\"":P0
+    "\"73\"" -> "\"71\"":P0
+    "\"71\"" -> "\"69\"":P0
+    "\"69\"" -> "\"68\"":P0
+    "\"68\"" -> "\"67\"":P0
+    "\"68\"" -> "\"95\"":P0
+    "\"95\"" -> "\"96\"":P0
+    "\"96\"" -> "\"98\"":P0
+    "\"67\"" -> "\"66\"":P0
+    "\"95\"" -> "\"66\"":P1
+    "\"96\"" -> "\"66\"":P2
+    "\"98\"" -> "\"66\"":P3
+    "\"66\"" -> "\"65\"":P0
+    "\"65\"" -> "\"63\"":P0
+    "\"63\"" -> "\"61\"":P0
+    "\"61\"" -> "\"60\"":P0
+    "\"60\"" -> "\"59\"":P0
+    "\"60\"" -> "\"100\"":P0
+    "\"100\"" -> "\"101\"":P0
+    "\"59\"" -> "\"58\"":P0
+    "\"100\"" -> "\"58\"":P1
+    "\"101\"" -> "\"58\"":P2
+    "\"58\"" -> "\"57\"":P0
+    "\"57\"" -> "\"55\"":P0
+    "\"55\"" -> "\"103\"":P0
+    "\"103\"" -> "\"105\"":P0
+    "\"105\"" -> "\"107\"":P0
+    "\"55\"" -> "\"54\"":P0
+    "\"103\"" -> "\"54\"":P1
+    "\"105\"" -> "\"54\"":P2
+    "\"107\"" -> "\"54\"":P3
+    "\"54\"" -> "\"53\"":P0
+    "\"53\"" -> "\"51\"":P0
+    "\"51\"" -> "\"49\"":P0
+    "\"49\"" -> "\"48\"":P0
+    "\"63\"" -> "\"48\"":P1
+    "\"48\"" -> "\"47\"":P0
+    "\"47\"" -> "\"45\"":P0
+    "\"45\"" -> "\"44\"":P0
+    "\"44\"" -> "\"43\"":P0
+    "\"43\"" -> "\"41\"":P0
+    "\"44\"" -> "\"111\"":P0
+    "\"111\"" -> "\"109\"":P0
+    "\"109\"" -> "\"112\"":P0
+    "\"41\"" -> "\"40\"":P0
+    "\"109\"" -> "\"40\"":P1
+    "\"112\"" -> "\"40\"":P2
+    "\"40\"" -> "\"39\"":P0
+    "\"39\"" -> "\"37\"":P0
+    "\"37\"" -> "\"35\"":P0
+    "\"35\"" -> "\"34\"":P0
+    "\"71\"" -> "\"34\"":P1
+    "\"34\"" -> "\"33\"":P0
+    "\"33\"" -> "\"31\"":P0
+    "\"31\"" -> "\"30\"":P0
+    "\"30\"" -> "\"29\"":P0
+    "\"29\"" -> "\"27\"":P0
+    "\"30\"" -> "\"116\"":P0
+    "\"116\"" -> "\"114\"":P0
+    "\"114\"" -> "\"117\"":P0
+    "\"27\"" -> "\"26\"":P0
+    "\"114\"" -> "\"26\"":P1
+    "\"117\"" -> "\"26\"":P2
+    "\"26\"" -> "\"25\"":P0
+    "\"25\"" -> "\"23\"":P0
+    "\"23\"" -> "\"21\"":P0
+    "\"23\"" -> "\"133\"":P0
+    "\"133\"" -> "\"132\"":P0
+    "\"37\"" -> "\"132\"":P1
+    "\"132\"" -> "\"131\"":P0
+    "\"131\"" -> "\"129\"":P0
+    "\"129\"" -> "\"128\"":P0
+    "\"128\"" -> "\"127\"":P0
+    "\"127\"" -> "\"125\"":P0
+    "\"128\"" -> "\"137\"":P0
+    "\"137\"" -> "\"135\"":P0
+    "\"135\"" -> "\"138\"":P0
+    "\"125\"" -> "\"124\"":P0
+    "\"135\"" -> "\"124\"":P1
+    "\"138\"" -> "\"124\"":P2
+    "\"124\"" -> "\"123\"":P0
+    "\"123\"" -> "\"121\"":P0
+    "\"121\"" -> "\"119\"":P0
+    "\"121\"" -> "\"154\"":P0
+    "\"154\"" -> "\"153\"":P0
+    "\"51\"" -> "\"153\"":P1
+    "\"153\"" -> "\"152\"":P0
+    "\"152\"" -> "\"150\"":P0
+    "\"150\"" -> "\"149\"":P0
+    "\"149\"" -> "\"148\"":P0
+    "\"148\"" -> "\"146\"":P0
+    "\"149\"" -> "\"158\"":P0
+    "\"158\"" -> "\"156\"":P0
+    "\"156\"" -> "\"159\"":P0
+    "\"146\"" -> "\"145\"":P0
+    "\"156\"" -> "\"145\"":P1
+    "\"159\"" -> "\"145\"":P2
+    "\"145\"" -> "\"144\"":P0
+    "\"144\"" -> "\"142\"":P0
+    "\"142\"" -> "\"140\"":P0
+    "\"21\"" -> "\"20\"":P0
+    "\"119\"" -> "\"20\"":P1
+    "\"140\"" -> "\"20\"":P2
+    "\"20\"" -> "\"19\"":P0
+    "\"19\"" -> "\"17\"":P0
+    "\"17\"" -> "\"16\"":P0
+    "\"16\"" -> "\"14\"":P0
+    "\"14\"" -> "\"12\"":P0
+    "\"12\"" -> "\"11\"":P0
+    "\"11\"" -> "\"10\"":P1
+    "\"10\"" -> "\"9\"":P0
+    "\"9\"" -> "\"7\"":P0
+    "\"12\"" -> "\"163\"":P0
+    "\"163\"" -> "\"161\"":P0
+    "\"161\"" -> "\"7\"":P1
+    "\"161\"" -> "\"167\"":P0
+    "\"167\"" -> "\"166\"":P0
+    "\"10\"" -> "\"166\"":P1
+    "\"166\"" -> "\"164\"":P0
+    "\"7\"" -> "\"6\"":P0
+    "\"164\"" -> "\"6\"":P1
+    "\"6\"" -> "\"5\"":P0
+    "\"5\"" -> "\"3\"":P0
+    "\"23\"" -> "\"172\"":P0
+    "\"121\"" -> "\"174\"":P0
+    "\"142\"" -> "\"176\"":P0
+    "\"172\"" -> "\"171\"":P0
+    "\"174\"" -> "\"171\"":P1
+    "\"176\"" -> "\"171\"":P2
+    "\"171\"" -> "\"170\"":P0
+    "\"170\"" -> "\"168\"":P0
+    "\"3\"" -> "\"2\"":P0
+    "\"168\"" -> "\"2\"":P1
+    "\"2\"" -> "\"1\"":P0
+}

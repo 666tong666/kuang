@@ -1,0 +1,235 @@
+/* pages/index/index.wxss —— 实时监测页样式（工业简洁风格） */
+
+.page {
+  padding-bottom: 40rpx;
+}
+
+/* ==================== 顶部连接状态栏 ==================== */
+.conn-bar {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFF;
+  padding: 18rpx 30rpx;
+  /* 顶部深灰条，营造仪表盘感 */
+  border-bottom: 4rpx solid #E0E4E8;
+}
+/* 已连接时状态栏底色微绿 */
+.conn-bar-on {
+  border-bottom-color: #2E7D32;
+}
+
+/* 状态指示灯：灰色=未连接，绿色=已连接 */
+.conn-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background-color: #B0B7BD;
+  margin-right: 14rpx;
+}
+.conn-dot-on {
+  background-color: #2E7D32;
+  box-shadow: 0 0 8rpx rgba(46, 125, 50, 0.6);
+}
+
+.conn-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #263238;
+  flex: 1;
+}
+
+.conn-time {
+  font-size: 24rpx;
+  color: #78848C;
+  font-family: "Courier New", monospace; /* 等宽字体，工业仪表感 */
+}
+
+/* ==================== 2x2 数据卡片网格 ==================== */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10rpx 12rpx;
+}
+
+.data-card {
+  width: calc(50% - 24rpx);
+  margin: 12rpx;
+  background-color: #FFFFFF;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(38, 50, 56, 0.08);
+  padding: 24rpx;
+  box-sizing: border-box;
+  border-top: 6rpx solid #263238; /* 顶部深色条：工业面板风格 */
+}
+
+/* 危险状态卡片：整体红色描边 */
+.data-card-danger {
+  border-top-color: #D32F2F;
+  background-color: #FFF5F5;
+}
+
+/* 风扇运行中：绿色描边 */
+.data-card-fan-on {
+  border-top-color: #2E7D32;
+  background-color: #F5FBF5;
+}
+
+/* 卡片头：图标 + 名称 */
+.data-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.data-icon {
+  font-size: 34rpx;
+  margin-right: 12rpx;
+}
+.data-name {
+  font-size: 28rpx;
+  color: #78848C;
+}
+
+/* 卡片主体：数值 + 单位 */
+.data-body {
+  display: flex;
+  align-items: baseline;
+}
+.data-value {
+  font-size: 72rpx;
+  font-weight: 700;
+  color: #263238;
+  font-family: "Courier New", monospace; /* 等宽数字，仪表盘感 */
+  line-height: 1.1;
+}
+.data-unit {
+  font-size: 26rpx;
+  color: #8A939B;
+  margin-left: 8rpx;
+}
+
+/* 卡片底部提示（气体卡片显示阈值） */
+.data-foot {
+  margin-top: 6rpx;
+}
+.data-tip {
+  font-size: 22rpx;
+  color: #9AA2A9;
+}
+
+/* 井下状态卡片的大字（正常绿/危险红，颜色类在 app.wxss 定义） */
+.data-status {
+  font-size: 44rpx;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* 风扇状态卡片的小字（关闭/运行中） */
+.text-mute {
+  color: #B0B7BD;
+}
+
+/* ==================== 井下状态卡片（独占一行） ==================== */
+.status-card {
+  margin: 24rpx;
+  padding: 24rpx 28rpx;
+  background-color: #FFFFFF;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(38, 50, 56, 0.08);
+  border-left: 8rpx solid #2E7D32; /* 正常：绿色左边框 */
+}
+
+.status-card-danger {
+  border-left-color: #D32F2F;
+  background-color: #FFF8F8;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #263238;
+  margin-bottom: 16rpx;
+}
+
+/* 状态徽标：右下角小标签 */
+.status-tag {
+  font-size: 24rpx;
+  font-weight: 700;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  line-height: 1.4;
+}
+.status-tag-ok {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+.status-tag-danger {
+  background-color: #FFEBEE;
+  color: #D32F2F;
+}
+
+/* 正常态文案 */
+.status-body-ok {
+  padding: 8rpx 0;
+}
+.status-ok-text {
+  font-size: 28rpx;
+  color: #2E7D32;
+}
+
+/* 危险态：每个告警类型一行 */
+.status-body-danger {
+  padding-top: 4rpx;
+}
+.alarm-row {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 2rpx solid #FFEBEE;
+}
+.alarm-row:last-child {
+  border-bottom: none;
+}
+.alarm-icon {
+  font-size: 34rpx;
+  margin-right: 16rpx;
+}
+.alarm-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #D32F2F;
+  flex: 1;
+}
+.alarm-detail {
+  font-size: 24rpx;
+  color: #B71C1C;
+  font-family: "Courier New", monospace;
+}
+
+/* ==================== 阈值设置卡片 ==================== */
+.th-row {
+  display: flex;
+  align-items: center;
+}
+.th-input {
+  flex: 1;
+  background-color: #F2F4F7;
+  border: 2rpx solid #DDE2E7;
+  border-radius: 8rpx;
+  padding: 16rpx 20rpx;
+  font-size: 30rpx;
+  font-family: "Courier New", monospace;
+}
+.th-btn {
+  width: 160rpx;
+  margin-left: 20rpx;
+  padding: 16rpx 0;
+}
+.th-tip {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: #9AA2A9;
+  line-height: 1.5;
+}

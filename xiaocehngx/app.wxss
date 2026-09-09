@@ -1,0 +1,76 @@
+/**app.wxss —— 全局公共样式（工业简洁风格）**/
+
+/* ==================== 工业风配色规范 ====================
+ * 背景    #F2F4F7  浅工业灰
+ * 卡片    #FFFFFF  白色面板 + 顶部深灰标题条
+ * 深灰    #263238  标题/主文字
+ * 次要文字 #78848C
+ * 强调橙  #F57C00  工业警示橙（tabBar 选中、按钮）
+ * 正常绿  #2E7D32  井下正常状态文字
+ * 危险红  #D32F2F  危险告警状态文字
+ * ==================================================== */
+
+page {
+  /* 页面基础底色 */
+  background-color: #F2F4F7;
+  /* 全局字体与默认文字色 */
+  color: #263238;
+  font-size: 28rpx;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+}
+
+/* ==================== 通用卡片 ==================== */
+.card {
+  background-color: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin: 20rpx 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(38, 50, 56, 0.06);
+}
+
+/* 卡片标题行：左侧橙色竖条 + 标题文字 */
+.card-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #263238;
+  margin-bottom: 20rpx;
+}
+.card-title::before {
+  content: "";
+  width: 8rpx;
+  height: 32rpx;
+  background-color: #F57C00;
+  border-radius: 4rpx;
+  margin-right: 16rpx;
+}
+
+/* ==================== 状态色（井下正常/危险） ==================== */
+.text-ok {
+  color: #2E7D32; /* 正常绿 */
+}
+.text-danger {
+  color: #D32F2F; /* 危险红 */
+}
+
+/* ==================== 通用按钮 ==================== */
+.btn {
+  border-radius: 10rpx;
+  font-size: 30rpx;
+  text-align: center;
+  padding: 20rpx 0;
+}
+.btn-primary {
+  background-color: #F57C00;
+  color: #FFFFFF;
+}
+.btn-dark {
+  background-color: #263238;
+  color: #FFFFFF;
+}
+/* 禁用态按钮（如"已连接"时不可重复点击） */
+.btn-disabled {
+  background-color: #C6CDD2;
+  color: #FFFFFF;
+}

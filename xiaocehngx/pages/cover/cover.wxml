@@ -1,0 +1,42 @@
+<!--pages/cover/cover.wxml —— 小程序启动封面（Welcome / Splash）
+     工业简洁风格：深灰底 + 工业橙强调色 + 加载动画
+     2.5 秒后自动跳转到首页；点击页面任意区域可立即跳过 -->
+
+<view class="page" bindtap="onTapSkip">
+
+  <!-- ============ 顶部品牌区 ============ -->
+  <view class="brand-block">
+
+    <!-- Logo（环形+中心标记，模拟仪表盘/雷达感） -->
+    <view class="logo">
+      <view class="logo-ring"></view>
+      <view class="logo-ring logo-ring-2"></view>
+      <view class="logo-core">⛏</view>
+    </view>
+
+    <!-- 标题 -->
+    <view class="title">井下环境监测</view>
+    <view class="subtitle">Mine Environment Monitor</view>
+
+    <!-- 标签条 -->
+    <view class="tag-row">
+      <view class="tag">物联网</view>
+      <view class="tag">华为云 IoTDA</view>
+      <view class="tag">实时数据</view>
+    </view>
+  </view>
+
+  <!-- ============ 底部加载区 ============ -->
+  <view class="bottom-block">
+    <view class="dot-row">
+      <view class="dot"></view>
+      <view class="dot"></view>
+      <view class="dot"></view>
+    </view>
+    <view class="loading-text">正在连接华为云 {{countdown}}s</view>
+
+    <!-- 跳过按钮（点击提前进入） -->
+    <view class="skip-btn" catchtap="onTapSkip">立即进入 ›</view>
+  </view>
+
+</view>

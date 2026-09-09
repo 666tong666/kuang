@@ -1,0 +1,33 @@
+# ===== 本地工具状态 =====
+.workbuddy/
+
+# ===== Python =====
+__pycache__/
+*.pyc
+230/venv2/
+
+# ===== AI 数据集 / 中间产物（体积大，可重新生成）=====
+230/helmet_project/dataset/
+230/helmet_project/dataset_yolo/
+230/helmet_dataset/
+230/helmet_project/gmodel_dump_dir/
+230/helmet_project/tmp/
+# 预训练底模（网上可下载，非训练成果）
+230/helmet_project/yolo26n.pt
+230/helmet_project/yolov8n.pt
+
+# ===== Keil MDK 构建产物 / IDE 状态 =====
+Objects/
+Listings/
+DebugConfig/
+*.uvguix.*
+*.bak
+JLinkLog.txt
+
+# ===== 微信开发者工具私有配置 =====
+xiaocehngx/project.private.config.json
+
+# ===== 系统杂项 =====
+Thumbs.db
+Desktop.ini
+*.log

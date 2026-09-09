@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/cover/cover",
+    "pages/index/index",
+    "pages/connect/connect",
+    "pages/history/history",
+    "pages/cloud/cloud"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#263238",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "井下环境监测",
+    "backgroundColor": "#F2F4F7",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#8A939B",
+    "selectedColor": "#F57C00",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "实时监测"
+      },
+      {
+        "pagePath": "pages/connect/connect",
+        "text": "蓝牙连接"
+      },
+      {
+        "pagePath": "pages/cloud/cloud",
+        "text": "华为云"
+      },
+      {
+        "pagePath": "pages/history/history",
+        "text": "历史数据"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

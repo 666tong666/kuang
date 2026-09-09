@@ -1,0 +1,7 @@
+path: D:/230/helmet_project/dataset_yolo
+train: images/train
+val: images/val
+
+names:
+  0: helmet   # wearing helmet
+  1: head     # head without helmet

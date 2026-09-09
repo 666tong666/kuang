@@ -1,0 +1,209 @@
+<!--pages/cloud/cloud.wxml —— 华为云 IoTDA 调试页
+     配置参数 -> 获取Token -> 设备信息 / 设备影子 / 下发消息 -->
+
+<view class="page">
+
+  <!-- ============ 域名白名单提示 ============ -->
+  <view class="panel">
+    <view class="panel-tip">
+      请求华为云域名需在开发者工具「详情 -> 本地设置」勾选「不校验合法域名」；
+      真机预览请打开调试模式。正式发布需将 iam / iotda 域名加入
+      小程序后台 request 合法域名。
+    </view>
+
+    <!-- Token 状态条 -->
+    <view class="token-bar {{hasToken ? 'token-ok' : 'token-none'}}">
+      <text class="token-label">Token 状态</text>
+      <text class="token-val">
+        {{hasToken ? '已缓存（' + tokenTime + ' 获取，23h 内复用）' : '未获取'}}
+      </text>
+    </view>
+  </view>
+
+  <!-- ============ 连接配置（所有 URL 与账号均可修改） ============ -->
+  <view class="panel">
+    <view class="section-title">连接配置</view>
+
+    <view class="form-item">
+      <text class="form-label">IAM地址</text>
+      <input class="form-input" value="{{cfg.iamUrl}}"
+             data-field="iamUrl" bindinput="onCfgInput"
+             placeholder="https://iam.cn-north-4.myhuaweicloud.com/v3/auth/tokens" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">IoT接入地址</text>
+      <input class="form-input" value="{{cfg.iotBase}}"
+             data-field="iotBase" bindinput="onCfgInput"
+             placeholder="https://xxxx.st1.iotda-app.cn-north-4.myhuaweicloud.com" />
+    </view>
+
+    <view class="form-row">
+      <view class="form-item form-item-half">
+        <text class="form-label">IAM用户名</text>
+        <input class="form-input" value="{{cfg.domainName}}"
+               data-field="domainName" bindinput="onCfgInput"
+               placeholder="账号名" />
+      </view>
+      <view class="form-item form-item-half">
+        <text class="form-label">用户名</text>
+        <input class="form-input" value="{{cfg.userName}}"
+               data-field="userName" bindinput="onCfgInput"
+               placeholder="子用户名" />
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">密码</text>
+      <input class="form-input" value="{{cfg.password}}" password
+             data-field="password" bindinput="onCfgInput"
+             placeholder="IAM 密码" />
+    </view>
+
+    <view class="form-row">
+      <view class="form-item form-item-half">
+        <text class="form-label">项目名</text>
+        <input class="form-input" value="{{cfg.projectName}}"
+               data-field="projectName" bindinput="onCfgInput"
+               placeholder="cn-north-4" />
+      </view>
+      <view class="form-item form-item-half">
+        <text class="form-label">项目ID</text>
+        <input class="form-input" value="{{cfg.projectId}}"
+               data-field="projectId" bindinput="onCfgInput"
+               placeholder="IoTDA 项目ID" />
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">设备ID</text>
+      <input class="form-input" value="{{cfg.deviceId}}"
+             data-field="deviceId" bindinput="onCfgInput"
+             placeholder="如 6a90dfaacbb0cf6bb97db0ce_xxx" />
+    </view>
+
+    <!-- 配置操作 -->
+    <view class="op-row">
+      <view class="btn btn-primary op-btn" bindtap="saveCfg">保存配置</view>
+      <view class="btn btn-dark op-btn" bindtap="resetUrls">恢复默认URL</view>
+    </view>
+    <view class="btn btn-primary {{busy ? 'btn-disabled' : ''}}"
+          bindtap="{{busy ? '' : 'fetchToken'}}">
+      {{busy && busyText === '获取Token中...' ? busyText : '获取Token'}}
+    </view>
+  </view>
+
+  <!-- ============ 设备管理（添加 / 修改 / 删除 / 选择） ============ -->
+  <view class="panel">
+    <view class="section-title">设备管理</view>
+    <view class="tip-text">
+      点击列表项选中设备（自动填入项目ID/设备ID），长按删除；
+      填好上方参数后点「{{editName ? '更新' : '添加'}}设备」保存为{{editName ? '修改' : '新增'}}。
+    </view>
+
+    <!-- 设备列表 -->
+    <view class="device-list" wx:if="{{devices.length > 0}}">
+      <view class="device-item {{editName === item.name ? 'device-item-active' : ''}}"
+            wx:for="{{devices}}" wx:key="name"
+            data-index="{{index}}"
+            bindtap="tapDevice" bindlongpress="removeDevice">
+        <view class="device-info">
+          <text class="device-name">{{item.name}}</text>
+          <text class="device-id">{{item.deviceId}}</text>
+        </view>
+        <view class="device-project">{{item.projectId}}</view>
+      </view>
+    </view>
+    <view class="empty" wx:else>暂无保存的设备</view>
+
+    <!-- 设备别名 + 添加按钮 -->
+    <view class="form-item">
+      <text class="form-label">设备别名</text>
+      <input class="form-input" value="{{devName}}"
+             bindinput="onDevNameInput"
+             placeholder="如：井盖设备 / 烟雾浓度（不填默认用设备ID）" />
+    </view>
+    <view class="btn btn-dark" bindtap="addDevice">{{editName ? '更新设备' : '添加设备'}}</view>
+  </view>
+
+  <!-- ============ 影子轮询（持续从华为云接收 STM32 上报数据）============ -->
+  <view class="panel">
+    <view class="section-title">影子轮询</view>
+    <view class="tip-text">
+      每 5 秒自动拉取一次设备影子，把数据推送到实时监测页（与蓝牙通道互斥，
+      <text class="warn">同一时间只跑一个通道</text>）。
+    </view>
+
+    <!-- 轮询状态条 -->
+    <view class="poll-bar {{polling ? 'poll-bar-on' : (pollFailCount > 0 ? 'poll-bar-err' : '') }}">
+      <view class="poll-dot {{polling ? 'poll-dot-on' : ''}}"></view>
+      <text class="poll-text">
+        <block wx:if="{{polling}}">
+          轮询运行中（{{pollFailCount > 0 ? '连续失败 ' + pollFailCount + ' 次' : '数据正常'}}）
+        </block>
+        <block wx:elif="{{pollFailCount > 0}}">
+          上次轮询失败 {{pollFailCount}} 次
+        </block>
+        <block wx:else>当前未启动轮询</block>
+      </text>
+    </view>
+
+    <!-- 三个按钮 -->
+    <view class="op-row">
+      <view class="btn btn-primary op-btn {{polling ? 'btn-disabled' : ''}}"
+            bindtap="{{polling ? '' : 'startPoll'}}">开始轮询</view>
+      <view class="btn btn-dark op-btn {{!polling ? 'btn-disabled' : ''}}"
+            bindtap="{{polling ? 'stopPoll' : ''}}">停止轮询</view>
+    </view>
+    <view class="btn btn-outline {{busy ? 'btn-disabled' : ''}}"
+          bindtap="{{busy ? '' : 'probePoll'}}">测试拉取（只跑一次）</view>
+
+    <!-- 实时日志 -->
+    <view class="poll-log" wx:if="{{pollLog.length > 0}}">
+      <view class="poll-log-title">最近日志</view>
+      <view class="poll-log-item" wx:for="{{pollLog}}" wx:key="idx">{{item}}</view>
+    </view>
+  </view>
+
+  <!-- ============ 调试动作 ============ -->
+  <view class="panel">
+    <view class="section-title">接口调试</view>
+
+    <!-- 下发消息内容 -->
+    <view class="form-item">
+      <text class="form-label">消息内容</text>
+      <textarea class="form-textarea" value="{{msgText}}"
+                bindinput="onMsgInput" maxlength="500"
+                placeholder="{alert:true}" />
+    </view>
+    <view class="msg-quick-row">
+      <view class="msg-quick" data-msg="{alert:true}" bindtap="fillMsg">{alert:true}</view>
+      <view class="msg-quick" data-msg="{alert:false}" bindtap="fillMsg">{alert:false}</view>
+    </view>
+
+    <!-- 动作按钮 -->
+    <view class="op-row">
+      <view class="btn btn-dark op-btn {{busy ? 'btn-disabled' : ''}}"
+            bindtap="{{busy ? '' : 'fetchDevice'}}">设备信息</view>
+      <view class="btn btn-dark op-btn {{busy ? 'btn-disabled' : ''}}"
+            bindtap="{{busy ? '' : 'fetchShadow'}}">设备影子</view>
+    </view>
+    <view class="btn btn-danger {{busy ? 'btn-disabled' : ''}}"
+          bindtap="{{busy ? '' : 'sendMessage'}}">下发消息</view>
+    <view class="tip-text tip-center">
+      {{busy ? busyText : '三个接口都会自动带 Token 并复用缓存'}}
+    </view>
+  </view>
+
+  <!-- ============ 结果展示 ============ -->
+  <view class="panel" wx:if="{{resultText}}">
+    <view class="result-title result-{{resultOk ? 'ok' : 'err'}}">
+      {{resultTitle}}
+      <text class="copy-btn" bindtap="copyResult">复制</text>
+    </view>
+    <scroll-view scroll-y class="result-scroll">
+      <text class="result-text" user-select>{{resultText}}</text>
+    </scroll-view>
+  </view>
+
+</view>

@@ -1,0 +1,323 @@
+/* pages/cloud/cloud.wxss —— 华为云调试页样式（沿用工业简洁风格） */
+
+.page {
+  padding-bottom: 40rpx;
+}
+
+/* ==================== 面板 ==================== */
+.panel {
+  background-color: #FFFFFF;
+  border-radius: 12rpx;
+  margin: 20rpx 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(38, 50, 56, 0.06);
+}
+
+.panel-tip {
+  font-size: 22rpx;
+  color: #8A939B;
+  line-height: 1.6;
+  background-color: #F5F7F9;
+  border-left: 6rpx solid #F57C00;
+  padding: 16rpx 20rpx;
+  border-radius: 0 8rpx 8rpx 0;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #263238;
+  margin-bottom: 20rpx;
+  padding-left: 16rpx;
+  border-left: 8rpx solid #F57C00;
+}
+
+/* ==================== Token 状态条 ==================== */
+.token-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8rpx;
+  padding: 16rpx 20rpx;
+}
+.token-ok {
+  background-color: #EAF3EB;
+  border: 2rpx solid #2E7D32;
+}
+.token-none {
+  background-color: #F7EDEA;
+  border: 2rpx solid #D32F2F;
+}
+.token-label {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.token-ok .token-label,
+.token-ok .token-val { color: #2E7D32; }
+.token-none .token-label,
+.token-none .token-val { color: #D32F2F; }
+.token-val {
+  font-size: 22rpx;
+}
+
+/* ==================== 表单 ==================== */
+.form-item {
+  margin-bottom: 20rpx;
+}
+.form-row {
+  display: flex;
+  margin-right: -10rpx;
+}
+.form-item-half {
+  flex: 1;
+  margin-right: 10rpx;
+  min-width: 0;
+}
+.form-label {
+  display: block;
+  font-size: 24rpx;
+  color: #78848C;
+  margin-bottom: 8rpx;
+}
+.form-input {
+  background-color: #F5F7F9;
+  border: 2rpx solid #E4E8EC;
+  border-radius: 8rpx;
+  padding: 14rpx 16rpx;
+  font-size: 26rpx;
+  color: #263238;
+}
+.form-textarea {
+  background-color: #F5F7F9;
+  border: 2rpx solid #E4E8EC;
+  border-radius: 8rpx;
+  padding: 14rpx 16rpx;
+  font-size: 26rpx;
+  color: #263238;
+  width: auto;
+  min-height: 90rpx;
+}
+
+/* ==================== 消息快捷按钮 ==================== */
+.msg-quick-row {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+.msg-quick {
+  font-size: 22rpx;
+  color: #F57C00;
+  background-color: #FDF1E5;
+  border: 2rpx solid #F57C00;
+  border-radius: 8rpx;
+  padding: 8rpx 20rpx;
+  margin-right: 16rpx;
+}
+
+/* ==================== 操作按钮 ==================== */
+.op-row {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+.op-btn {
+  flex: 1;
+  margin: 0 10rpx;
+}
+.op-btn:first-child { margin-left: 0; }
+.op-btn:last-child { margin-right: 0; }
+
+.btn-danger {
+  background-color: #D32F2F;
+  color: #FFFFFF;
+  border-radius: 10rpx;
+  font-size: 30rpx;
+  text-align: center;
+  padding: 20rpx 0;
+}
+
+/* ==================== 设备列表 ==================== */
+.device-list {
+  border-top: 2rpx solid #EBEEF1;
+  margin-bottom: 20rpx;
+}
+.device-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 10rpx;
+  border-bottom: 2rpx solid #EBEEF1;
+  border-radius: 8rpx;
+}
+.device-item-active {
+  background-color: #FDF1E5;
+}
+.device-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.device-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #263238;
+}
+.device-id {
+  font-size: 22rpx;
+  color: #8A939B;
+  margin-top: 4rpx;
+  word-break: break-all;
+}
+.device-project {
+  font-size: 20rpx;
+  color: #78848C;
+  margin-left: 16rpx;
+}
+
+.empty {
+  text-align: center;
+  font-size: 24rpx;
+  color: #A5ADB4;
+  padding: 30rpx 0;
+}
+
+/* ==================== 提示文字 ==================== */
+.tip-text {
+  font-size: 24rpx;
+  color: #78848C;
+  margin-bottom: 20rpx;
+  line-height: 1.6;
+}
+.tip-center {
+  text-align: center;
+  margin-top: 16rpx;
+  margin-bottom: 0;
+}
+
+/* ==================== 结果展示 ==================== */
+.result-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.result-ok { color: #2E7D32; }
+.result-err { color: #D32F2F; }
+.copy-btn {
+  font-size: 22rpx;
+  font-weight: 400;
+  color: #F57C00;
+  padding: 6rpx 20rpx;
+  border: 2rpx solid #F57C00;
+  border-radius: 8rpx;
+}
+.result-scroll {
+  max-height: 600rpx;
+  background-color: #263238;
+  border-radius: 8rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+.result-text {
+  display: block;
+  font-size: 22rpx;
+  color: #C8E6C9;
+  font-family: Menlo, Consolas, monospace;
+  line-height: 1.5;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+/* ==================== 轮询面板 ==================== */
+/* 外框按钮（仅描边，浅橙）：用于「测试拉取」类次要操作 */
+.btn-outline {
+  background-color: #FFFFFF;
+  color: #F57C00;
+  border: 2rpx solid #F57C00;
+  border-radius: 10rpx;
+  font-size: 30rpx;
+  text-align: center;
+  padding: 20rpx 0;
+  margin-bottom: 20rpx;
+}
+
+.warn {
+  color: #E65100;
+  font-weight: 600;
+}
+
+/* 状态条 */
+.poll-bar {
+  display: flex;
+  align-items: center;
+  background-color: #F5F7F9;
+  border: 2rpx solid #E4E8EC;
+  border-radius: 10rpx;
+  padding: 18rpx 24rpx;
+  margin: 16rpx 0 24rpx;
+  transition: all 0.2s ease;
+}
+.poll-bar-on {
+  background-color: #FFF3E0;
+  border-color: #F57C00;
+}
+.poll-bar-err {
+  background-color: #FDECEA;
+  border-color: #D32F2F;
+}
+.poll-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background-color: #B0BEC5;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+.poll-dot-on {
+  background-color: #F57C00;
+  animation: poll-pulse 1.4s ease-in-out infinite;
+}
+@keyframes poll-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.6); }
+  50%      { box-shadow: 0 0 0 8rpx rgba(245, 124, 0, 0); }
+}
+.poll-text {
+  font-size: 26rpx;
+  color: #455A64;
+}
+.poll-bar-on .poll-text {
+  color: #E65100;
+  font-weight: 600;
+}
+.poll-bar-err .poll-text {
+  color: #D32F2F;
+  font-weight: 600;
+}
+
+/* 日志区 */
+.poll-log {
+  background-color: #263238;
+  border-radius: 10rpx;
+  padding: 18rpx 22rpx;
+  margin-top: 16rpx;
+}
+.poll-log-title {
+  font-size: 22rpx;
+  color: #F57C00;
+  margin-bottom: 10rpx;
+  font-weight: 600;
+}
+.poll-log-item {
+  font-size: 22rpx;
+  color: #C8E6C9;
+  font-family: Menlo, Consolas, monospace;
+  line-height: 1.6;
+  word-break: break-all;
+  padding: 4rpx 0;
+  border-bottom: 2rpx dashed #37474F;
+}
+.poll-log-item:last-child {
+  border-bottom: none;
+}

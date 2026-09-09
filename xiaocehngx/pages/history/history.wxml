@@ -1,0 +1,55 @@
+<!--pages/history/history.wxml —— 历史数据页
+     展示最近 30 条历史监测数据 -->
+
+<view class="page">
+
+  <!-- ============ 顶部统计栏 ============ -->
+  <view class="stat-bar">
+    <text class="stat-text">历史记录 {{total}}/{{maxCount}} 条</text>
+    <view class="btn-danger-sm" bindtap="clearAll">清空历史</view>
+  </view>
+
+  <!-- ============ 历史数据列表 ============ -->
+  <view class="list">
+
+    <view class="row" wx:for="{{list}}" wx:key="id">
+
+      <!-- 左列：时间 -->
+      <view class="row-time">
+        <text class="row-clock">{{item.time}}</text>
+        <text class="row-index">#{{total - index}}</text>
+      </view>
+
+      <!-- 中列：三个测量值 -->
+      <view class="row-values">
+        <view class="v-item">
+          <text class="v-label">温度</text>
+          <text class="v-num">{{item.temp}}℃</text>
+        </view>
+        <view class="v-item">
+          <text class="v-label">湿度</text>
+          <text class="v-num">{{item.humi}}%</text>
+        </view>
+        <view class="v-item">
+          <text class="v-label">气体</text>
+          <!-- 气体超标记录数值显示红色 -->
+          <text class="v-num {{item.gas > threshold ? 'text-danger' : ''}}">{{item.gas}}ppm</text>
+        </view>
+      </view>
+
+      <!-- 右列：井下状态徽标（正常绿/危险红） -->
+      <view class="row-status {{item.status === 1 ? 'badge-danger' : 'badge-ok'}}">
+        {{item.status === 1 ? '危险' : '正常'}}
+      </view>
+
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{total === 0}}">
+      <text>暂无历史数据</text>
+      <text class="empty-sub">连接设备后，实时数据将自动保存（最多 30 条）</text>
+    </view>
+
+  </view>
+
+</view>

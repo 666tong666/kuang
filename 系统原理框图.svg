@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1180" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrowUp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="1500" height="1180" fill="#f8fafc"/>
+
+  <!-- title -->
+  <text x="750" y="52" text-anchor="middle" font-size="30" font-weight="bold" fill="#0f172a">井下环境监测系统 · 原理框图</text>
+  <text x="750" y="80" text-anchor="middle" font-size="15" fill="#64748b">STM32F407VET6（标准外设库 · 裸机前后台） + DX-BT24 BLE / ESP8266 MQTT 双通道 + 微信原生小程序</text>
+
+  <!-- ============ layer tags ============ -->
+  <g font-size="15" font-weight="bold">
+    <rect x="30" y="112" width="70" height="30" rx="15" fill="#16a34a"/>
+    <text x="65" y="133" text-anchor="middle" fill="#ffffff">感知层</text>
+    <rect x="30" y="300" width="70" height="30" rx="15" fill="#2563eb"/>
+    <text x="65" y="321" text-anchor="middle" fill="#ffffff">主控层</text>
+    <rect x="30" y="632" width="70" height="30" rx="15" fill="#7c3aed"/>
+    <text x="65" y="653" text-anchor="middle" fill="#ffffff">通信层</text>
+    <rect x="30" y="942" width="70" height="30" rx="15" fill="#ea580c"/>
+    <text x="65" y="963" text-anchor="middle" fill="#ffffff">应用层</text>
+  </g>
+
+  <!-- ============ 感知层：传感器 ============ -->
+  <g>
+    <rect x="140" y="105" width="220" height="70" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="250" y="133" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">DHT11 温湿度</text>
+    <text x="250" y="156" text-anchor="middle" font-size="12" fill="#166534">单总线 GPIO</text>
+
+    <rect x="390" y="105" width="220" height="70" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="500" y="133" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">MQ135 气体传感器</text>
+    <text x="500" y="156" text-anchor="middle" font-size="12" fill="#166534">ADC · 气体等效 ppm</text>
+
+    <rect x="640" y="105" width="220" height="70" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="750" y="133" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">MPU6050 震动检测</text>
+    <text x="750" y="156" text-anchor="middle" font-size="12" fill="#166534">I2C · 震动锁存标志</text>
+
+    <rect x="890" y="105" width="220" height="70" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="1000" y="133" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">光敏电阻</text>
+    <text x="1000" y="156" text-anchor="middle" font-size="12" fill="#166534">ADC · 光照强度</text>
+  </g>
+
+  <!-- 传感器 → MCU 箭头 -->
+  <g stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)">
+    <line x1="250" y1="175" x2="250" y2="295"/>
+    <line x1="500" y1="175" x2="500" y2="295"/>
+    <line x1="750" y1="175" x2="750" y2="295"/>
+    <line x1="1000" y1="175" x2="1000" y2="295"/>
+  </g>
+
+  <!-- ============ 主控层：STM32 ============ -->
+  <rect x="140" y="298" width="970" height="270" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="625" y="330" text-anchor="middle" font-size="19" font-weight="bold" fill="#1e3a8a">STM32F407VET6 主控（Keil MDK · 标准外设库 · 裸机前后台）</text>
+
+  <g>
+    <rect x="165" y="350" width="215" height="185" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.2"/>
+    <text x="272" y="378" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1e40af">数据采集与滤波</text>
+    <text x="272" y="404" text-anchor="middle" font-size="12" fill="#1e3a8a">· MQ135 16次均值采样</text>
+    <text x="272" y="426" text-anchor="middle" font-size="12" fill="#1e3a8a">· R0 自动校准(上电预热10s)</text>
+    <text x="272" y="448" text-anchor="middle" font-size="12" fill="#1e3a8a">· KEY0 长按1.5s 重校准</text>
+    <text x="272" y="470" text-anchor="middle" font-size="12" fill="#1e3a8a">· DHT11 温湿度补偿</text>
+    <text x="272" y="492" text-anchor="middle" font-size="12" fill="#1e3a8a">· Rs/R0 → ppm 换算</text>
+    <text x="272" y="514" text-anchor="middle" font-size="12" fill="#1e3a8a">· 阈值判断前打印调试</text>
+
+    <rect x="405" y="350" width="215" height="185" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.2"/>
+    <text x="512" y="378" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1e40af">阈值判断</text>
+    <text x="512" y="404" text-anchor="middle" font-size="12" fill="#1e3a8a">· 温度 &gt; 32 ℃</text>
+    <text x="512" y="426" text-anchor="middle" font-size="12" fill="#1e3a8a">· 气体 &gt; gas_max</text>
+    <text x="512" y="448" text-anchor="middle" font-size="12" fill="#1e3a8a">  （默认 50 ppm，可下发修改）</text>
+    <text x="512" y="470" text-anchor="middle" font-size="12" fill="#1e3a8a">· MPU6050 震动标志</text>
+    <text x="512" y="492" text-anchor="middle" font-size="12" fill="#1e3a8a">· 任一超限 → status=1</text>
+    <text x="512" y="514" text-anchor="middle" font-size="12" fill="#1e3a8a">· 100ms 主循环节拍</text>
+
+    <rect x="645" y="350" width="215" height="185" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.2"/>
+    <text x="752" y="378" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1e40af">告警联动</text>
+    <text x="752" y="404" text-anchor="middle" font-size="12" fill="#1e3a8a">· 蜂鸣器报警</text>
+    <text x="752" y="426" text-anchor="middle" font-size="12" fill="#1e3a8a">· LED 状态指示</text>
+    <text x="752" y="448" text-anchor="middle" font-size="12" fill="#1e3a8a">· 电机（风扇排风）</text>
+    <text x="752" y="470" text-anchor="middle" font-size="12" fill="#1e3a8a">· OLED 本地显示</text>
+    <text x="752" y="492" text-anchor="middle" font-size="12" fill="#1e3a8a">· 看门狗 IWDG/WWDG</text>
+
+    <rect x="885" y="350" width="200" height="185" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.2"/>
+    <text x="985" y="378" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1e40af">通信处理</text>
+    <text x="985" y="404" text-anchor="middle" font-size="12" fill="#1e3a8a">· 上行：JSON 组帧</text>
+    <text x="985" y="426" text-anchor="middle" font-size="12" fill="#1e3a8a">  每 5s 同时发 BLE+MQTT</text>
+    <text x="985" y="448" text-anchor="middle" font-size="12" fill="#1e3a8a">· 下行：解析 gas_max 指令</text>
+    <text x="985" y="470" text-anchor="middle" font-size="12" fill="#1e3a8a">  USART2 中断收 + 空闲断帧</text>
+    <text x="985" y="492" text-anchor="middle" font-size="12" fill="#1e3a8a">· 回 ack 确认帧</text>
+    <text x="985" y="514" text-anchor="middle" font-size="12" fill="#1e3a8a">· RTC 时间戳</text>
+  </g>
+
+  <!-- ============ 本地交互 ============ -->
+  <rect x="1210" y="298" width="260" height="270" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="1340" y="330" text-anchor="middle" font-size="17" font-weight="bold" fill="#78350f">本地交互</text>
+  <g font-size="13" fill="#78350f">
+    <text x="1340" y="365" text-anchor="middle">OLED（I2C）实时显示</text>
+    <text x="1340" y="395" text-anchor="middle">蜂鸣器 BEEP（告警）</text>
+    <text x="1340" y="425" text-anchor="middle">LED PG13（心跳/告警）</text>
+    <text x="1340" y="455" text-anchor="middle">KEY0 PG2（输入：重校准）</text>
+    <text x="1340" y="485" text-anchor="middle">电机（排风联动）</text>
+  </g>
+  <g font-size="11.5" fill="#92400e">
+    <text x="1340" y="515" text-anchor="middle">调试串口 USART1 PA9/PA10</text>
+    <text x="1340" y="535" text-anchor="middle">@115200 → USB-TTL</text>
+  </g>
+
+  <!-- MCU ↔ 本地交互 -->
+  <line x1="1110" y1="425" x2="1204" y2="425" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+
+  <!-- ============ 通信层 ============ -->
+  <!-- BT24 -->
+  <rect x="140" y="635" width="400" height="130" rx="10" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="340" y="667" text-anchor="middle" font-size="17" font-weight="bold" fill="#4c1d95">DX-BT24 蓝牙模块（BLE 5.1）</text>
+  <g font-size="12.5" fill="#5b21b6">
+    <text x="340" y="693" text-anchor="middle">USART2 · PA2(TX)/PA3(RX) · 9600bps</text>
+    <text x="340" y="715" text-anchor="middle">透传服务 UUID: FFE0 · Notify/Write: FFE1</text>
+    <text x="340" y="737" text-anchor="middle">上电 PA2/PA3 钳位保护 · 广播名 BT24</text>
+  </g>
+
+  <!-- ESP8266 -->
+  <rect x="600" y="635" width="510" height="130" rx="10" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+  <text x="855" y="667" text-anchor="middle" font-size="17" font-weight="bold" fill="#134e4a">ESP8266 WiFi 模块（AT 指令）</text>
+  <g font-size="12.5" fill="#115e59">
+    <text x="855" y="693" text-anchor="middle">USART3 · PD8(TX)/PD9(RX) · 115200bps</text>
+    <text x="855" y="715" text-anchor="middle">接入路由器 → 连接 MQTT Broker</text>
+    <text x="855" y="737" text-anchor="middle">固件内 mqtt.c 协议实现（发布/订阅）</text>
+  </g>
+
+  <!-- MQTT Broker -->
+  <rect x="600" y="815" width="510" height="90" rx="10" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+  <text x="855" y="850" text-anchor="middle" font-size="16" font-weight="bold" fill="#134e4a">MQTT Broker（EMQX / 华为云 IoT）</text>
+  <text x="855" y="878" text-anchor="middle" font-size="12.5" fill="#115e59">数据主题发布 · 支持远程访问（不受距离限制）</text>
+
+  <!-- MCU → BT24 -->
+  <line x1="340" y1="568" x2="340" y2="631" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <!-- MCU → ESP8266 -->
+  <line x1="855" y1="568" x2="855" y2="631" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <!-- ESP8266 → Broker -->
+  <line x1="855" y1="765" x2="855" y2="811" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="872" y="792" font-size="11.5" fill="#475569">MQTT 发布</text>
+
+  <!-- ============ 应用层：微信小程序 ============ -->
+  <rect x="140" y="945" width="970" height="175" rx="10" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+  <text x="625" y="977" text-anchor="middle" font-size="18" font-weight="bold" fill="#7c2d12">微信小程序（原生框架 · WXML/WXSS/JS）</text>
+  <g font-size="12.5" fill="#7c2d12">
+    <text x="265" y="1008" text-anchor="middle" font-weight="bold" font-size="13.5">pages/index 实时监测</text>
+    <text x="265" y="1030" text-anchor="middle">数据卡片 · 阈值设置与下发</text>
+    <text x="265" y="1050" text-anchor="middle">超限告警弹窗</text>
+
+    <text x="530" y="1008" text-anchor="middle" font-weight="bold" font-size="13.5">pages/connect 设备连接</text>
+    <text x="530" y="1030" text-anchor="middle">BLE / MQTT 双模式二选一</text>
+    <text x="530" y="1050" text-anchor="middle">扫描 · 连接 · 断开重连</text>
+
+    <text x="795" y="1008" text-anchor="middle" font-weight="bold" font-size="13.5">pages/history 历史数据</text>
+    <text x="795" y="1030" text-anchor="middle">本地存储最近 30 条</text>
+    <text x="795" y="1050" text-anchor="middle">超标数值标红</text>
+  </g>
+  <g font-size="11.5" fill="#9a3412">
+    <text x="625" y="1082" text-anchor="middle">utils：protocol.js 协议解析/半包拼接 · bleService.js · mqttService.js(MQTT.js 4.3.7 over WSS) · store.js · eventBus.js</text>
+    <text x="625" y="1104" text-anchor="middle">阈值保存：已连接 BLE → 写 FFE1 下发到设备；未连接 → 仅存本地</text>
+  </g>
+
+  <!-- ============ BLE 双向通道 ============ -->
+  <!-- 上行: BT24 → 小程序 -->
+  <line x1="280" y1="765" x2="280" y2="941" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="268" y="820" text-anchor="end" font-size="12" fill="#334155" font-weight="bold">上行 · Notify</text>
+  <text x="268" y="838" text-anchor="end" font-size="11.5" fill="#334155">JSON 数据帧（每 5s）</text>
+  <text x="268" y="856" text-anchor="end" font-size="11" fill="#64748b">{"temp":25.0,"humi":60.0,</text>
+  <text x="268" y="872" text-anchor="end" font-size="11" fill="#64748b">"gas":110,"status":0}\n</text>
+
+  <!-- 下行: 小程序 → BT24 -->
+  <line x1="420" y1="945" x2="420" y2="769" stroke="#b45309" stroke-width="2" marker-end="url(#arrowUp)"/>
+  <text x="436" y="820" font-size="12" fill="#b45309" font-weight="bold">下行 · Write</text>
+  <text x="436" y="838" font-size="11.5" fill="#b45309">阈值下发指令</text>
+  <text x="436" y="856" font-size="11" fill="#92400e">{"cmd":"gas_max","val":80}\n</text>
+  <text x="436" y="872" font-size="11" fill="#92400e">设备回 ack 确认帧</text>
+
+  <!-- MQTT → 小程序 -->
+  <line x1="855" y1="905" x2="855" y2="941" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="875" y="930" font-size="11.5" fill="#475569">MQTT over WebSocket(WSS) 订阅</text>
+
+  <!-- ============ 备注 ============ -->
+  <g font-size="12" fill="#475569">
+    <text x="1210" y="690" font-weight="bold" fill="#334155">两条互备通道：</text>
+    <text x="1210" y="715">· BLE：手机直连，无需</text>
+    <text x="1210" y="735">  路由器/云端，近距离</text>
+    <text x="1210" y="755">· MQTT：经 WiFi 上云，</text>
+    <text x="1210" y="775">  支持远程监控</text>
+    <text x="1210" y="810" font-weight="bold" fill="#334155">注意事项：</text>
+    <text x="1210" y="835">· 阈值下发仅支持 BLE 通道</text>
+    <text x="1210" y="855">· 板子重启后阈值回到</text>
+    <text x="1210" y="875">  默认 50 ppm（未存 Flash）</text>
+    <text x="1210" y="905">· 报警条件：温度&gt;32℃ 或</text>
+    <text x="1210" y="925">  气体&gt;gas_max 或 震动</text>
+  </g>
+
+  <!-- footer -->
+  <text x="750" y="1160" text-anchor="middle" font-size="12" fill="#94a3b8">工程目录：kuan/（STM32 固件） · xiaocehngx/（微信小程序） · bt24_test/（蓝牙模块测试工程）　|　协议详见 xiaocehngx/docs/STM32数据上报协议.md</text>
+</svg>

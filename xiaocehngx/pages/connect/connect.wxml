@@ -1,0 +1,54 @@
+<!--pages/connect/connect.wxml —— 蓝牙连接页
+     工业简洁风格：顶部状态卡片 + 大扫描按钮 + 设备列表 + 断开按钮。
+     MQTT 通道不再提供入口；如需走云端，请切到「华为云」Tab -->
+
+<view class="page">
+
+  <!-- ============ 当前状态卡片 ============ -->
+  <view class="status-card {{connected ? 'status-on' : ''}}">
+    <view class="status-row">
+      <view class="status-dot {{connected ? 'status-dot-on' : ''}}"></view>
+      <text class="status-main">{{ connected ? ('已连接：' + deviceName) : '当前未连接蓝牙' }}</text>
+    </view>
+    <text class="status-sub">{{ statusTip }}</text>
+  </view>
+
+  <!-- ============ 未连接时：扫描 + 列表 ============ -->
+  <block wx:if="{{!connected}}">
+    <view class="btn btn-dark action-btn" bindtap="onScanTap">
+      {{ scanning ? '停止扫描' : '开始扫描附近设备' }}
+    </view>
+    <view class="scan-tip">提示：请确认手机蓝牙已开启，且已授予小程序蓝牙权限</view>
+
+    <!-- 设备列表 -->
+    <view class="list" wx:if="{{devices.length > 0}}">
+      <view class="list-title">附近的蓝牙设备（{{devices.length}}）</view>
+      <view
+        class="device-item"
+        wx:for="{{devices}}"
+        wx:key="deviceId"
+        data-device-id="{{item.deviceId}}"
+        data-device-name="{{item.name}}"
+        bindtap="onDeviceTap"
+      >
+        <view class="device-info">
+          <text class="device-name">{{item.name}}</text>
+          <text class="device-id">{{item.deviceId}}</text>
+        </view>
+        <text class="device-rssi">{{item.RSSI}} dBm</text>
+      </view>
+    </view>
+
+    <!-- 扫描中暂无设备 -->
+    <view class="empty" wx:if="{{scanning && devices.length === 0}}">
+      正在搜索设备…
+    </view>
+  </block>
+
+  <!-- ============ 已连接时：断开按钮 ============ -->
+  <block wx:else>
+    <view class="btn btn-outline action-btn" bindtap="onDisconnectTap">断开蓝牙连接</view>
+    <view class="scan-tip">已建立连接后，可直接进入「实时监测」查看数据</view>
+  </block>
+
+</view>

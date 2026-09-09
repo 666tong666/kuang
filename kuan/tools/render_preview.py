@@ -1,0 +1,22 @@
+"""把新生成的'温'字模按 OLED 写入顺序还原成 16x16 像素图"""
+data = [
+    0x10, 0x60, 0x02, 0x8C, 0x00, 0x00, 0xFE, 0x92,
+    0x92, 0x92, 0x92, 0x92, 0xFE, 0x00, 0x00, 0x00,
+    0x04, 0x04, 0x7E, 0x01, 0x40, 0x7E, 0x42, 0x42,
+    0x7E, 0x42, 0x7E, 0x42, 0x42, 0x7E, 0x40, 0x00,
+]
+
+print("重排后 byte[0..15] = 上半 16 列, byte[16..31] = 下半 16 列")
+print()
+for row in range(16):
+    line = ""
+    for col in range(16):
+        if row < 8:
+            byte = data[col]
+        else:
+            byte = data[col + 16]
+        if byte & (1 << (row % 8)):
+            line += "##"
+        else:
+            line += "  "
+    print(f"row{row:2d}: {line}")
