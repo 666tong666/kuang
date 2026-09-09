@@ -8,7 +8,7 @@
 
 | K230 安全帽检测（实时推理） | 微信小程序（真机运行） |
 |:---:|:---:|
-| ![K230安全帽检测](docs/images/k230-detection.png) | ![小程序实时监测](docs/images/app_realtime.jpg) |
+| <img src="docs/images/k230-detection.png" width="400" alt="K230安全帽检测"> | <img src="docs/images/app_realtime.jpg" width="280" alt="小程序实时监测"> |
 | 绿框=戴帽 红框=未戴帽，右上角实时统计 | 环境数据 + 安全帽人数 + 告警状态 + 阈值设置 |
 
 </div>
