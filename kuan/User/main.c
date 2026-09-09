@@ -47,9 +47,17 @@ float gas_max = 50.0f;         // 气体等效ppm上限(可由小程序经BLE下发修改)
  * 注：用户当前未接物理风扇, 该状态仅用于小程序联动显示 */
 
 // 震动检测参数
-uint16_t g_shake_threshold = 1400; // 阈值，可用全局变量
+/* 阈值含义: 相邻两次采样(约100ms)间的加速度变化量, 单位LSB。
+ * ACCEL_CONFIG为±2g量程(16384 LSB/g), 4096 LSB = 0.25g ——
+ * 手碰/挪动/小角度旋转(重力分量变化)均低于此值不再误报,
+ * 机械冲击、持续晃动仍可靠触发; 嫌不灵敏可调低(旧值1400=0.085g) */
+uint16_t g_shake_threshold = 4096;
 #define SHAKE_CNT         3        // 连续N次超限确认震动
 #define SHAKE_RELEASE_CNT 5        // 震动消失后再等5个周期解除锁存
+
+/* 震动上报粘性标志: 检测到震动即置1, 由5s周期上报流程读走后清0。
+ * 解决锁存仅维持约0.5s、短震动落在两次上报之间被漏掉的问题 */
+uint8_t shake_pending = 0;
 
 /**
  * @brief  MPU6050震动检测函数
@@ -95,6 +103,7 @@ uint8_t MPU6050_VibrationDetect(int16_t ax, int16_t ay, int16_t az)
                 printf("!!!VIBRATION DETECT!!! deltaAX:%d deltaAY:%d deltaAZ:%d \r\n",delta_ax,delta_ay,delta_az);
             }
             vib_latch = 1;
+            shake_pending = 1;    /* 粘性置位, 直到被上报流程取走 */
         }
     }
     else
@@ -363,13 +372,17 @@ int main(void)
 			float temp_val = temp_int + temp_deci / 10.0f;
 			float humi_val = humi_int + humi_deci / 10.0f;
 			float gas_val  = nh3_ppm;
+			/* 震动取"瞬时锁存 | 上报期粘性标志", 取走即清:
+			 * 确保两次上报之间发生过的短震动也会随本帧发出 */
+			uint8_t shake_report = shake_flag | shake_pending;
+			shake_pending = 0;
 			/* 兼容旧字段: 任一告警即 status=1 */
-			uint8_t status = (temp_val > TEMP_MAX || gas_val > gas_max || shake_flag) ? 1 : 0;
+			uint8_t status = (temp_val > TEMP_MAX || gas_val > gas_max || shake_report) ? 1 : 0;
 			/* v2 协议: 告警位掩码（每类独立置位） */
 			uint8_t alarm = 0;
-			if (temp_val > TEMP_MAX)  alarm |= 0x01;  /* bit0 温度过高 */
-			if (gas_val  > gas_max)   alarm |= 0x02;  /* bit1 气体超标 */
-			if (shake_flag)           alarm |= 0x04;  /* bit2 震动告警 */
+			if (temp_val > TEMP_MAX)   alarm |= 0x01;  /* bit0 温度过高 */
+			if (gas_val  > gas_max)    alarm |= 0x02;  /* bit1 气体超标 */
+			if (shake_report)          alarm |= 0x04;  /* bit2 震动告警 */
 			/* 风扇状态跟随告警：温度或气体任一超标 -> 开(显示), 否则关 */
 			uint8_t fan = (temp_val > TEMP_MAX || gas_val > gas_max) ? 1 : 0;
 			if (fan) Fan_On(); else Fan_Off();
