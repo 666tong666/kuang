@@ -34,13 +34,10 @@ extern int16_t gx_off, gy_off, gz_off;
  * 远低于50ppm报警线; 相对浓度眮Ｈ园磀atasheet曲线斜率响应) */
 #define MQ135_CLEAN_RS_RATIO  3.4f
 
-/* MQ135预热校准策略: 加热丝到工作温度需1~3分钟, 冷态时Rs偏高,
- * 校准太早会使R0偏大 -> 热透后ppm直接顶格9999。
- * 至少预热MIN秒, 每1秒比对ADC均值, 连续STABLE秒漂移<2%才算稳定,
- * 最长MAX秒强制校准(新传感器首次使用建议先通电老化数小时) */
-#define MQ135_WARMUP_MIN_S    60
-#define MQ135_WARMUP_MAX_S    300
-#define MQ135_STABLE_NEED_S   20
+/* MQ135预热校准: 实测该传感器预热约1分钟后读数已无漂移趋势, 只剩
+ * ±10%短时噪声(再长的"稳定检测"只会被噪声反复打断), 故用固定预热时长,
+ * 校准时用6.4s长窗口平均压制波动(新传感器首次使用建议先通电老化数小时) */
+#define MQ135_WARMUP_S        120
 
 /*阈值配置*/
 #define TEMP_MAX       32      // 温度上限 ℃
@@ -142,12 +139,12 @@ static void MQ135_Calibrate(void)
     uint16_t adc;
     float    Rs;
 
-    for(k = 0; k < 32; k++)
+    for(k = 0; k < 64; k++)
     {
         sum += MQ135_Get_ADC();
-        delay_ms(20);
+        delay_ms(100);                     /* 6.4s长窗口, 压制±10%短时波动 */
     }
-    adc = (uint16_t)(sum / 32);
+    adc = (uint16_t)(sum / 64);
     if(adc < 10) adc = 10;                    /* 防除零 */
     Rs = RL * (4095.0f / (float)adc - 1.0f);
     gas_r0 = Rs / MQ135_CLEAN_RS_RATIO;
@@ -174,47 +171,29 @@ static void MQ135_Calibrate(void)
     }
 }
 
-/* MQ135预热+校准: 等加热丝热透、读数稳定后再取基线
- * 稳定判据: 每秒1次ADC均值(16次采样), 相邻漂移<2%且连续MQ135_STABLE_NEED_S秒 */
+/* MQ135预热+校准: 固定MQ135_WARMUP_S秒预热后取清洁空气基线 */
 static void MQ135_WarmupAndCalibrate(void)
 {
     uint16_t waited_s = 0;
-    uint8_t  stable_s = 0;
-    uint16_t adc_ref  = MQ135_Get_ADC_Avg(16);
 
-    printf("MQ135 warming up %d~%ds, keep clean air...\r\n",
-           MQ135_WARMUP_MIN_S, MQ135_WARMUP_MAX_S);
+    printf("MQ135 warming up %ds, keep clean air...\r\n", MQ135_WARMUP_S);
 
-    while(waited_s < MQ135_WARMUP_MAX_S)
+    while(waited_s < MQ135_WARMUP_S)
     {
         delay_ms(1000);
         waited_s++;
 
-        uint16_t adc_now = MQ135_Get_ADC_Avg(16);
-        int32_t  drift   = (int32_t)adc_now - (int32_t)adc_ref;
-        if(drift < 0) drift = -drift;
-        if(drift <= (int32_t)adc_ref / 50) stable_s++;   /* 漂移<2% */
-        else                              stable_s = 0;
-        adc_ref = adc_now;
-
-        /* OLED: 第3行显示预热秒数与稳定秒数 */
+        /* OLED: 第3行显示预热倒计时(秒) */
         OLED_ShowString(3, 1,  "warm ");
         OLED_ShowNum(3, 6,  waited_s, 3);
-        OLED_ShowString(3, 9,  "s stb");
-        OLED_ShowNum(3, 14, stable_s, 2);
+        OLED_ShowString(3, 9,  "/120s");
 
         if(waited_s % 10 == 0)
         {
-            printf("  warm %us: adc=%d stable=%us\r\n", waited_s, adc_now, stable_s);
-        }
-
-        if(waited_s >= MQ135_WARMUP_MIN_S && stable_s >= MQ135_STABLE_NEED_S)
-        {
-            break;
+            printf("  warm %us: adc=%d\r\n", waited_s, MQ135_Get_ADC_Avg(16));
         }
     }
-    printf("MQ135 warmup finished in %us (stable=%us), calibrating...\r\n",
-           waited_s, stable_s);
+    printf("MQ135 warmup finished, calibrating...\r\n");
     MQ135_Calibrate();
 }
 
