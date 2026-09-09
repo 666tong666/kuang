@@ -60,6 +60,8 @@ uint16_t MQ135_Get_ADC(void)
 }
 
 //n次采样取平均，滤除ADC随机噪声（n建议8~32）
+//注意: 与MQ135_Get_ADC一样带">4095自动右移"兼容——本板上ADC1实际以
+//左对齐出数(原始值最大65520), 不修正会算出负Rs -> ppm顶格9999
 uint16_t MQ135_Get_ADC_Avg(uint8_t n)
 {
     uint32_t sum = 0;
@@ -68,9 +70,15 @@ uint16_t MQ135_Get_ADC_Avg(uint8_t n)
     if(n == 0) n = 1;
     for(i = 0; i < n; i++)
     {
+        uint16_t val;
         ADC_SoftwareStartConv(ADC1);
         while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
-        sum += ADC_GetConversionValue(ADC1);
+        val = ADC_GetConversionValue(ADC1);
+        if(val > 4095)           /* 左对齐兼容: 右移4位还原12位 */
+        {
+            val >>= 4;
+        }
+        sum += val;
     }
     return (uint16_t)(sum / n);
 }
