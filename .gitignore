@@ -23,6 +23,7 @@ DebugConfig/
 *.uvguix.*
 *.bak
 JLinkLog.txt
+build_log.txt
 
 # ===== 微信开发者工具私有配置 =====
 xiaocehngx/project.private.config.json
