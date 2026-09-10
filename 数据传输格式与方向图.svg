@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1640 1400" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+  <defs>
+    <marker id="mGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+    </marker>
+    <marker id="mBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="mOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/>
+    </marker>
+    <marker id="mPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="1640" height="1400" fill="#f8fafc"/>
+
+  <!-- title -->
+  <text x="820" y="50" text-anchor="middle" font-size="30" font-weight="bold" fill="#0f172a">井下环境智能监测系统 · 数据传输格式与方向全景图</text>
+  <text x="820" y="78" text-anchor="middle" font-size="15" fill="#64748b">共 11 条链路，每条标注：物理通道 / 数据形式 / 方向 / 频率 —— 圆圈编号与下方报文样例一一对应</text>
+
+  <!-- legend -->
+  <g font-size="12" fill="#475569">
+    <line x1="250" y1="108" x2="308" y2="108" stroke="#16a34a" stroke-width="2.5" marker-end="url(#mGreen)"/>
+    <text x="316" y="112">板内有线（单总线 / 模拟量 / 软 I2C / UART）</text>
+    <line x1="660" y1="108" x2="718" y2="108" stroke="#2563eb" stroke-width="2.5" marker-start="url(#mBlue)" marker-end="url(#mBlue)"/>
+    <text x="726" y="112">无线双向透传（BLE / MQTT）</text>
+    <line x1="960" y1="108" x2="1018" y2="108" stroke="#7c3aed" stroke-width="2.5" stroke-dasharray="6 4" marker-start="url(#mPurple)" marker-end="url(#mPurple)"/>
+    <text x="1026" y="112">HTTPS REST 轮询（请求/响应）</text>
+    <line x1="1300" y1="108" x2="1358" y2="108" stroke="#b45309" stroke-width="2.5" marker-end="url(#mOrange)"/>
+    <text x="1366" y="112">本地单向输出（GPIO / 日志）</text>
+  </g>
+
+  <!-- column captions -->
+  <g font-size="14" font-weight="bold" fill="#475569" text-anchor="middle">
+    <text x="165" y="142">现场感知端</text>
+    <text x="735" y="142">STM32 主控</text>
+    <text x="1215" y="142">通信模块 / 本地</text>
+    <text x="1505" y="142">云 / 手机</text>
+  </g>
+
+  <!-- ============ 传感器（绿色） ============ -->
+  <g>
+    <rect x="40" y="155" width="250" height="78" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="165" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">DHT11 温湿度传感器</text>
+    <text x="165" y="209" text-anchor="middle" font-size="12" fill="#166534">单总线 · 湿度 / 温度（整数+小数字节）</text>
+
+    <rect x="40" y="255" width="250" height="78" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="165" y="285" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">MQ135 有害气体传感器</text>
+    <text x="165" y="309" text-anchor="middle" font-size="12" fill="#166534">AO 模拟输出 → PA4（ADC1_IN4）</text>
+
+    <rect x="40" y="355" width="250" height="78" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="165" y="385" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">MPU6050 三轴加速度</text>
+    <text x="165" y="409" text-anchor="middle" font-size="12" fill="#166534">软 I2C · ±2g 量程（16384 LSB/g）</text>
+
+    <rect x="40" y="455" width="250" height="122" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="165" y="485" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">K230 CanMV 视觉板</text>
+    <text x="165" y="509" text-anchor="middle" font-size="12" fill="#166534">YOLOv8n 安全帽检测（每帧推理输出）</text>
+    <text x="165" y="533" text-anchor="middle" font-size="12" fill="#166534">helmet=戴帽数 / head=未戴数</text>
+    <text x="165" y="559" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#14532d" font-family="Consolas, 'Courier New', monospace">helmet:2,head:1\r\n</text>
+  </g>
+
+  <!-- ============ STM32 主控（蓝色） ============ -->
+  <g>
+    <rect x="560" y="155" width="350" height="485" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="735" y="187" text-anchor="middle" font-size="17" font-weight="bold" fill="#1e3a8a">STM32F407VET6 主控</text>
+    <line x1="580" y1="198" x2="890" y2="198" stroke="#93c5fd" stroke-width="1"/>
+    <g font-size="12.5" fill="#1e3a8a">
+      <text x="580" y="222">· 100ms 主循环：采集 / 滤波 / 补偿</text>
+      <text x="580" y="245">· MQ135 温湿度补偿 + R0 基线校准</text>
+      <text x="580" y="268">· 震动锁存：连续3次确认 / 5周期解除</text>
+      <text x="580" y="291">· alarm 位掩码：bit0温 bit1气 bit2震</text>
+      <text x="580" y="314">· 每 5s 组包上报（v2.1 八字段）</text>
+      <text x="580" y="337">· 告警状态变化 ≥200ms 事件补发</text>
+      <text x="580" y="360">· UART 中断断帧：K230 行 / BLE 指令</text>
+    </g>
+    <line x1="580" y1="380" x2="890" y2="380" stroke="#93c5fd" stroke-width="1"/>
+    <text x="580" y="404" font-size="13" font-weight="bold" fill="#1e3a8a">对外接口</text>
+    <g font-size="12.5" fill="#1e3a8a">
+      <text x="580" y="427">ADC1_IN4 ← MQ135 模拟量</text>
+      <text x="580" y="450">单总线 ← DHT11 · 软I2C ↔ MPU6050</text>
+      <text x="580" y="473">USART1 调试 / USART2 蓝牙(9600)</text>
+      <text x="580" y="496">USART3 WiFi(115200) / UART4 K230</text>
+      <text x="580" y="519">GPIO → 蜂鸣器·LED·风扇 · I2C → OLED</text>
+    </g>
+    <line x1="580" y1="536" x2="890" y2="536" stroke="#93c5fd" stroke-width="1"/>
+    <text x="580" y="560" font-size="13" font-weight="bold" fill="#1e3a8a">主循环数据流</text>
+    <g font-size="12.5" fill="#1e3a8a">
+      <text x="580" y="583">读传感器 → 算法/阈值 → alarm/fan</text>
+      <text x="580" y="606">→ 组 JSON → BLE + MQTT 同帧双发</text>
+      <text x="580" y="629">→ OLED 四行：温/湿/气体/状态+H:xU:y</text>
+    </g>
+  </g>
+
+  <!-- ============ 通信模块 / 本地（紫色 / 灰色） ============ -->
+  <g>
+    <rect x="1090" y="155" width="250" height="100" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="1215" y="183" text-anchor="middle" font-size="16" font-weight="bold" fill="#4c1d95">DX-BT24 蓝牙模块</text>
+    <text x="1215" y="207" text-anchor="middle" font-size="12" fill="#5b21b6">BLE 透传 · UART 侧 9600 8N1</text>
+    <text x="1215" y="229" text-anchor="middle" font-size="12" fill="#5b21b6">服务 FFE0 / 特征 FFE1（notify+write）</text>
+    <text x="1215" y="251" text-anchor="middle" font-size="12" fill="#5b21b6">与手机 BLE 直连，数据原样透传</text>
+
+    <rect x="1090" y="310" width="250" height="100" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="1215" y="338" text-anchor="middle" font-size="16" font-weight="bold" fill="#4c1d95">ESP8266 WiFi 模块</text>
+    <text x="1215" y="362" text-anchor="middle" font-size="12" fill="#5b21b6">AT 固件 · TCP 透传模式</text>
+    <text x="1215" y="384" text-anchor="middle" font-size="12" fill="#5b21b6">连接 2.4G 热点 → 华为云接入点:1883</text>
+    <text x="1215" y="406" text-anchor="middle" font-size="12" fill="#5b21b6">进入透传后字节流 = MQTT 报文</text>
+
+    <rect x="1090" y="465" width="250" height="95" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+    <text x="1215" y="492" text-anchor="middle" font-size="16" font-weight="bold" fill="#334155">本地执行 / 显示</text>
+    <text x="1215" y="516" text-anchor="middle" font-size="12" fill="#475569">0.96" OLED 四行（温/湿/气体/状态）</text>
+    <text x="1215" y="538" text-anchor="middle" font-size="12" fill="#475569">蜂鸣器·LED 告警 · 风扇联动 · H:xU:y</text>
+
+    <rect x="1090" y="615" width="250" height="95" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+    <text x="1215" y="642" text-anchor="middle" font-size="16" font-weight="bold" fill="#334155">电脑串口助手</text>
+    <text x="1215" y="666" text-anchor="middle" font-size="12" fill="#475569">USB-TTL ← PA9(TX) · 115200</text>
+    <text x="1215" y="688" text-anchor="middle" font-size="12" fill="#475569">printf 诊断日志 · 联调排查</text>
+  </g>
+
+  <!-- ============ 云 / 手机（橙色） ============ -->
+  <g>
+    <rect x="1400" y="155" width="210" height="150" rx="10" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+    <text x="1505" y="185" text-anchor="middle" font-size="17" font-weight="bold" fill="#7c2d12">微信小程序</text>
+    <text x="1505" y="211" text-anchor="middle" font-size="12" fill="#9a3412">BLE 直连 + 云端轮询双通道</text>
+    <text x="1505" y="233" text-anchor="middle" font-size="12" fill="#9a3412">实时卡片 · 告警弹窗 · 震动提醒</text>
+    <text x="1505" y="255" text-anchor="middle" font-size="12" fill="#9a3412">阈值下发 · 历史 30 条</text>
+    <text x="1505" y="277" text-anchor="middle" font-size="12" fill="#9a3412">protocol.js 三路统一解析</text>
+
+    <rect x="1400" y="375" width="210" height="140" rx="10" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+    <text x="1505" y="405" text-anchor="middle" font-size="17" font-weight="bold" fill="#7c2d12">华为云 IoTDA</text>
+    <text x="1505" y="431" text-anchor="middle" font-size="12" fill="#9a3412">设备接入 TCP :1883</text>
+    <text x="1505" y="453" text-anchor="middle" font-size="12" fill="#9a3412">属性存储 · 设备影子</text>
+    <text x="1505" y="475" text-anchor="middle" font-size="12" fill="#9a3412">产品模型：服务 show</text>
+    <text x="1505" y="497" text-anchor="middle" font-size="12" fill="#9a3412">仅存储模型已定义属性</text>
+  </g>
+
+  <!-- ============ 链路 ①~④：传感器 → STM32（绿） ============ -->
+  <g>
+    <path d="M 290 194 L 552 240" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#mGreen)"/>
+    <text x="423" y="170" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#14532d">① 单总线 · 40bit（湿8+温8+校验）</text>
+    <text x="423" y="187" text-anchor="middle" font-size="11" fill="#166534">MCU 发起始 → 传感器回传 · 数据单向 · 约200ms/次</text>
+
+    <path d="M 290 308 L 552 330" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#mGreen)"/>
+    <text x="423" y="278" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#14532d">② AO 模拟电压 0~3.3V → ADC1_IN4</text>
+    <text x="423" y="294" text-anchor="middle" font-size="11" fill="#166534">连续采样 · 16 次均值滤波 · 单向</text>
+
+    <path d="M 294 400 L 552 412" stroke="#16a34a" stroke-width="2.5" fill="none" marker-start="url(#mGreen)" marker-end="url(#mGreen)"/>
+    <text x="423" y="380" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#14532d">③ 软 I2C 读 6B 加速度计数据</text>
+    <text x="423" y="434" text-anchor="middle" font-size="11" fill="#166534">双向（写地址→读数据） · 100ms/次</text>
+
+    <path d="M 290 520 L 552 545" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#mGreen)"/>
+    <text x="423" y="498" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#14532d">④ UART4 · 115200 8N1 · 文本行</text>
+    <text x="423" y="568" text-anchor="middle" font-size="11" fill="#166534">单线 TX→RX 单向 · 每帧推理输出 1 行（十几行/秒）</text>
+  </g>
+
+  <!-- ============ 链路 ⑤~⑧：无线双向（蓝） ============ -->
+  <g>
+    <path d="M 914 205 L 1086 205" stroke="#2563eb" stroke-width="2.5" fill="none" marker-start="url(#mBlue)" marker-end="url(#mBlue)"/>
+    <text x="998" y="185" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1e3a8a">⑤ USART2 · 9600 8N1</text>
+    <text x="998" y="226" text-anchor="middle" font-size="11" fill="#1d4ed8">JSON 帧+\n · 双向 · 5s+事件补发</text>
+
+    <path d="M 1340 205 L 1392 212" stroke="#2563eb" stroke-width="2.5" fill="none" marker-start="url(#mBlue)" marker-end="url(#mBlue)"/>
+    <text x="1215" y="276" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1e3a8a">⑥ BLE 透传 FFE0/FFE1 · 与手机双向（下行指令见样例 B）</text>
+
+    <path d="M 914 385 L 1086 367" stroke="#2563eb" stroke-width="2.5" fill="none" marker-start="url(#mBlue)" marker-end="url(#mBlue)"/>
+    <text x="998" y="350" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1e3a8a">⑦ USART3 · 115200</text>
+    <text x="998" y="404" text-anchor="middle" font-size="11" fill="#1d4ed8">AT 指令 → 透传 · 双向</text>
+
+    <path d="M 1340 370 L 1392 418" stroke="#2563eb" stroke-width="2.5" fill="none" marker-start="url(#mBlue)" marker-end="url(#mBlue)"/>
+    <text x="1215" y="431" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#1e3a8a">⑧ MQTT over TCP :1883 · 双向（PUBLISH 上行 / 订阅命令下行，见样例 C）</text>
+  </g>
+
+  <!-- ============ 链路 ⑨：REST（紫虚线） ============ -->
+  <g>
+    <path d="M 1505 309 L 1505 371" stroke="#7c3aed" stroke-width="2.5" stroke-dasharray="6 4" fill="none" marker-start="url(#mPurple)" marker-end="url(#mPurple)"/>
+    <text x="1412" y="328" font-size="10.5" font-weight="bold" fill="#5b21b6">⑨ HTTPS REST</text>
+    <text x="1412" y="344" font-size="10.5" fill="#6d28d9">POST 取 token</text>
+    <text x="1412" y="360" font-size="10.5" fill="#6d28d9">GET 影子 · 5s 轮询</text>
+  </g>
+
+  <!-- ============ 链路 ⑩⑪：本地输出（橙） ============ -->
+  <g>
+    <path d="M 914 560 L 1082 507" stroke="#b45309" stroke-width="2.5" fill="none" marker-end="url(#mOrange)"/>
+    <text x="998" y="520" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#92400e">⑩ GPIO / I2C · 单向</text>
+    <text x="998" y="548" text-anchor="middle" font-size="11" fill="#b45309">OLED·蜂鸣器·LED·风扇</text>
+
+    <path d="M 914 600 L 1082 652" stroke="#b45309" stroke-width="2.5" fill="none" marker-end="url(#mOrange)"/>
+    <text x="998" y="612" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#92400e">⑪ PA9 调试口 115200 · 单向</text>
+    <text x="998" y="672" text-anchor="middle" font-size="11" fill="#b45309">printf 文本日志（样例见 D 区）</text>
+  </g>
+
+  <!-- ============ 报文样例 ============ -->
+  <text x="40" y="768" font-size="18" font-weight="bold" fill="#0f172a">关键报文样例（与固件 / 小程序源码逐一对应）</text>
+
+  <!-- A 统一上行数据帧 -->
+  <g>
+    <rect x="40" y="790" width="1560" height="185" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="60" y="818" font-size="14.5" font-weight="bold" fill="#1e3a8a">A · 统一上行数据帧 v2.1 —— ⑤蓝牙通道 与 ⑧MQTT通道 字段完全一致（每 5s 周期 + 告警状态变化 ≥200ms 事件补发）</text>
+    <text x="60" y="846" font-size="12.5" fill="#334155" font-family="Consolas, 'Courier New', monospace">BLE 帧（尾部以 \n 结尾，经 FFE1 notify 到达手机）：</text>
+    <text x="60" y="870" font-size="12.5" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">{"temp":25.0,"humi":60.0,"gas":110,"status":0,"fan":0,"alarm":2,"helmet":2,"head":1}\n</text>
+    <text x="60" y="898" font-size="12.5" fill="#334155">MQTT PUBLISH payload（主题 $oc/devices/{device_id}/sys/properties/report）：</text>
+    <text x="60" y="922" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">{"services":[{"service_id":"show","properties":{"humi":60,"temp":25,"gas":110,"fan":0,"alarm":2,"helmet":2,"head":1},"event_time":"20151212T121212Z"}]}</text>
+    <text x="60" y="952" font-size="12" fill="#1e3a8a">alarm 位掩码：bit0=温度过高 / bit1=气体超标 / bit2=震动告警（可同位置位）；status=0/1 为兼容旧协议字段；fan 随温度或气体超标联动</text>
+  </g>
+
+  <!-- B BLE 下行指令 -->
+  <g>
+    <rect x="40" y="1000" width="755" height="150" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="60" y="1028" font-size="14.5" font-weight="bold" fill="#14532d">B · BLE 下行指令与应答（⑥ · 帧尾 \n，USART2 空闲中断断帧）</text>
+    <text x="60" y="1058" font-size="12.5" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">↓ 手机→固件：{"cmd":"gas_max","val":80}\n</text>
+    <text x="60" y="1084" font-size="12.5" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">↑ 固件→手机 ：{"cmd":"gas_max","ack":80}\n</text>
+    <text x="60" y="1112" font-size="12" fill="#166534">值越界回 {"cmd":"gas_max","ack":err}；阈值范围 1~9999 ppm，写入固件立即生效</text>
+  </g>
+
+  <!-- C AT 序列 → MQTT -->
+  <g>
+    <rect x="845" y="1000" width="755" height="150" rx="10" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="865" y="1028" font-size="14.5" font-weight="bold" fill="#713f12">C · ESP8266 AT 序列 → MQTT 报文（⑦→⑧）</text>
+    <text x="865" y="1056" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">AT+RST → AT+CWMODE_CUR=1 → AT+CWJAP="SSID","PWD"（GOT IP）</text>
+    <text x="865" y="1080" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">→ AT+CIPSTART="TCP","…st1.iotda-device….myhuaweicloud.com",1883 → AT+CIPMODE=1 → AT+CIPSEND</text>
+    <text x="865" y="1104" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">透传内 MQTT 报文：CONNECT 0x10 / PUBLISH 0x30 / PINGREQ 0xC0 00（KeepAlive=100s）</text>
+    <text x="865" y="1130" font-size="11.5" fill="#713f12">订阅下行：$oc/devices/{id}/sys/messages/down 与 …/sys/commands/request_id={request_id}</text>
+  </g>
+
+  <!-- D 单向文本流样例 -->
+  <g>
+    <rect x="40" y="1175" width="755" height="155" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+    <text x="60" y="1203" font-size="14.5" font-weight="bold" fill="#334155">D · 单向文本流实测样例（④ K230 行 / ⑪ 调试日志）</text>
+    <text x="60" y="1230" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">helmet:2,head:1\r\n                        ← K230 每帧推理输出（115200）</text>
+    <text x="60" y="1252" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">ADC:1234 Rs:8.21 R0:12.50 PPM:36.4       ← 气体链路诊断</text>
+    <text x="60" y="1274" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">[MPU] ax=-212 ay=388 az=16384 lat=0 pend=0        ← 震动诊断</text>
+    <text x="60" y="1296" font-size="12" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">MQTT upload: temp=25.0 humi=60.0 gas=36.4 fan=0 alarm=0 helmet=2 head=1</text>
+  </g>
+
+  <!-- E 云 REST -->
+  <g>
+    <rect x="845" y="1175" width="755" height="155" rx="10" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="865" y="1203" font-size="14.5" font-weight="bold" fill="#5b21b6">E · 小程序 ↔ 华为云 REST（⑨ · 手机侧主动轮询，间隔 5s）</text>
+    <text x="865" y="1230" font-size="11.5" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">POST https://iam.cn-north-4.myhuaweicloud.com/v3/auth/tokens → 响应头 X-Subject-Token</text>
+    <text x="865" y="1254" font-size="11.5" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">GET  https://{接入地址}.st1.iotda-app.cn-north-4.myhuaweicloud.com</text>
+    <text x="865" y="1276" font-size="11.5" fill="#0f172a" font-family="Consolas, 'Courier New', monospace">     /v5/iot/{projectId}/devices/{deviceId}/shadow</text>
+    <text x="865" y="1302" font-size="11.5" fill="#5b21b6">返回 shadow[].reported.properties（字段同 A），与 BLE 通道两路统一解析</text>
+  </g>
+
+  <!-- footer -->
+  <text x="820" y="1372" text-anchor="middle" font-size="13" fill="#475569">双通道互为备份：蓝牙近距低时延，华为云不受距离限制；两条通道字段完全一致，小程序 utils/protocol.js 对 BLE / MQTT / 设备影子三路统一解析。</text>
+</svg>
