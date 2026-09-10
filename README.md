@@ -84,7 +84,7 @@ flowchart LR
 **数据传输格式与方向全景图**（11 条链路的物理通道 / 数据形式 / 方向 / 频率，圆圈编号与图中报文样例一一对应）：
 
 <div align="center">
-<img src="数据传输格式与方向图.svg" width="1100" alt="数据传输格式与方向全景图">
+<img src="docs/images/data-flow-diagram.svg" width="1100" alt="数据传输格式与方向全景图">
 </div>
 
 ## 数据链路
