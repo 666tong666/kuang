@@ -43,8 +43,8 @@
     <text x="750" y="156" text-anchor="middle" font-size="12" fill="#166534">I2C · 震动锁存标志</text>
 
     <rect x="890" y="105" width="220" height="70" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
-    <text x="1000" y="133" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">光敏电阻</text>
-    <text x="1000" y="156" text-anchor="middle" font-size="12" fill="#166534">ADC · 光照强度</text>
+    <text x="1000" y="133" text-anchor="middle" font-size="16" font-weight="bold" fill="#14532d">K230 视觉板</text>
+    <text x="1000" y="156" text-anchor="middle" font-size="12" fill="#166534">UART4 · 安全帽人数检测</text>
   </g>
 
   <!-- 传感器 → MCU 箭头 -->
