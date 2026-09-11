@@ -81,6 +81,11 @@ flowchart LR
 双通道互为备份：现场近距用蓝牙直连（实时性最好），远程监管走华为云（不受距离限制）。
 两条通道的数据帧格式完全一致，小程序端解析层统一处理。
 
+下位机固件基于 **FreeRTOS V10.4.6**（RVDS/CM4F 移植层，AC5 编译）：采集（100ms 节拍）、
+上报（5s 周期 + 告警事件驱动补发）、本地显示/声光联动、BLE 指令解析各为独立任务，
+用互斥锁/事件组/信号量同步；ESP8266 联网重试移入任务后不再阻塞整机——
+无 WiFi 时仅云端通道不可用，采集、显示与蓝牙通道照常工作。
+
 **数据传输格式与方向全景图**（11 条链路的物理通道 / 数据形式 / 方向 / 频率，圆圈编号与图中报文样例一一对应）：
 
 <div align="center">
@@ -195,10 +200,13 @@ sequenceDiagram
 
 ```
 kuang/
-├── kuan/                      ★ STM32 主固件（Keil MDK 工程）
-│   ├── User/main.c               主循环：采集、告警、组包上报
+├── kuan/                      ★ STM32 主固件（Keil MDK 工程 + FreeRTOS）
+│   ├── User/main.c               外设初始化、创建任务、启动调度器
+│   ├── User/app_tasks.c          业务任务：启动校准/采集/上报/显示/BLE指令
+│   ├── User/FreeRTOSConfig.h     FreeRTOS 裁剪配置（堆32KB、优先级约定）
+│   ├── FreeRTOS/                 FreeRTOS-Kernel V10.4.6（RVDS/CM4F 移植层）
 │   ├── Driver/                   外设驱动（USART/UART4、ADC、DHT11、OLED、BEEP…）
-│   ├── System/                   ESP8266 + MQTT 华为云、MPU6050 软 I2C
+│   ├── System/                   ESP8266 + MQTT 华为云、DWT 延时、MPU6050 软 I2C
 │   └── Project/STM.uvprojx       Keil 工程文件（AC5 + MicroLIB）
 ├── xiaocehngx/                ★ 微信小程序
 │   ├── pages/index               实时监测（卡片、告警弹窗、阈值设置）

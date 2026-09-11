@@ -1,5 +1,21 @@
 #include "mq135.h"
 
+/* 等待转换完成并读取 (RTOS版: 带超时上限)
+ * ADC1 是单例外设, startup 与 sensor 两个任务都会触发转换:
+ * 对方读 DR 会清掉 EOC, 无超时等待会永久卡死 —— 超时后按无效值处理 */
+#define MQ135_EOC_GUARD  50000u
+
+static uint16_t MQ135_WaitEOC_Read(void)
+{
+    uint32_t guard = 0;
+
+    while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET)
+    {
+        if(++guard > MQ135_EOC_GUARD) return 0u;   /* 超时: 本次按0处理 */
+    }
+    return ADC_GetConversionValue(ADC1);
+}
+
 void ADC_MQ135_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -47,15 +63,14 @@ uint16_t MQ135_Get_ADC(void)
 {
     uint16_t val;
     ADC_SoftwareStartConv(ADC1);        //软件触发转换
-    while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET); //等待转换完成
-    val = ADC_GetConversionValue(ADC1); //读取结果
-    
+    val = MQ135_WaitEOC_Read();         //等待转换完成并读取(带超时)
+
     // 如果 ADC 的对齐方式被其他外设改成了左对齐（数值>4095），自动右移恢复正常 12 位
     if(val > 4095)
     {
         val = val >> 4;
     }
-    
+
     return val;
 }
 
@@ -72,8 +87,7 @@ uint16_t MQ135_Get_ADC_Avg(uint8_t n)
     {
         uint16_t val;
         ADC_SoftwareStartConv(ADC1);
-        while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
-        val = ADC_GetConversionValue(ADC1);
+        val = MQ135_WaitEOC_Read();     /* 带超时, 防双任务竞争EOC死等 */
         if(val > 4095)           /* 左对齐兼容: 右移4位还原12位 */
         {
             val >>= 4;

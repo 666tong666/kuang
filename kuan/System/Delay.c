@@ -1,71 +1,52 @@
 #include "Delay.h"
 
-// uint8_t  uint16_t  uint32_t   
-// 0~255     0~65535  0~xxxxxx
+/* ============================================================
+ * 延时驱动 (FreeRTOS 版)
+ * 原版用 SysTick 忙等实现 us/ms 延时 —— 与 FreeRTOS 的 SysTick
+ * 节拍冲突, 调度器启动后严禁使用。改为 DWT CYCCNT 周期计数:
+ *   - 不占用任何定时器外设, 调度器启动前后均可用
+ *   - 纯忙等, 可在中断/临界区内安全使用 (DHT11 时序依赖)
+ * 任务内的长延时请使用 vTaskDelay(), 不要用本文件接口占着 CPU
+ * ============================================================ */
+
+void DWT_Init(void)
+{
+    /* 使能 DWT 计数器: DEMCR.TRCENA + CYCCNT 使能 */
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
 
 void Delay(volatile uint32_t cnt)
 {
-
-	while (cnt > 0){
-		cnt--;
-	}
+    while (cnt > 0){
+        cnt--;
+    }
 }
 
-// 1s = 1000ms   1ms = 1000us 
-
-// 21MHz -> 1us 数 21 个数
-
+/* 微秒级忙等 (DWT 周期差值计算, 自动处理 32 位回绕) */
 void delay_us(uint32_t us)
 {
-	//  000000000 000000000 000000000 000000000
-	SysTick->CTRL = 0;
-	// 设置重装载值
-	SysTick->LOAD = us * 21 ;
-	//清空一下当前计数寄存器
-	SysTick->VAL = 0;
-	//使能
-	SysTick->CTRL = 1;
-	//卡住 卡到数完 
-	//0111 1000  如何判断 第四位是不是 1 ?????
-	//0000 1000  按位与
-	//----------------------------------
-	//0000 1000  == 0
-	
-	while((SysTick->CTRL & 0x00010000) == 0);
-	//关闭定时器
-	SysTick->CTRL = 0;	
+    uint32_t start = DWT->CYCCNT;
+    uint32_t ticks = us * (SystemCoreClock / 1000000u);
+
+    while ((DWT->CYCCNT - start) < ticks);
 }
 
-// ms 数值不能超过 798 
+/* 毫秒级忙等 (任务上下文的长延时请改用 vTaskDelay) */
 void delay_ms(uint32_t ms)
 {
-	//  000000000 000000000 000000000 000000000
-	SysTick->CTRL = 0;
-	// 设置重装载值
-	SysTick->LOAD = ms * 21 * 1000 ;
-	//清空一下当前计数寄存器
-	SysTick->VAL = 0;
-	//使能
-	SysTick->CTRL = 1;
-	//卡住 卡到数完 
-	//0111 1000  如何判断 第四位是不是 1 ?????
-	//0000 1000  按位与
-	//----------------------------------
-	//0000 1000  == 0
-	
-	while((SysTick->CTRL & 0x00010000) == 0);
-	//关闭定时器
-	SysTick->CTRL = 0;	
-
+    while (ms--)
+    {
+        delay_us(1000);
+    }
 }
 
-
 void delay_s(uint32_t s)
-{	
-	while(s--)
-	{
-		delay_ms(500);
-		delay_ms(500);
-	}
-
+{
+    while(s--)
+    {
+        delay_ms(500);
+        delay_ms(500);
+    }
 }

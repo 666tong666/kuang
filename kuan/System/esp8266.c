@@ -1,4 +1,9 @@
 #include "esp8266.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
+/* RTOS版: 本文件所有流程只在 vReportTask 任务上下文中运行,
+ * 等待一律用 vTaskDelay 让出CPU (delay_ms 忙等会占住CPU) */
 
 //usart3发送和接收数组
 uint8_t usart3_txbuf[256];
@@ -39,17 +44,17 @@ void ESP8266_Init(void)
 	ESP8266_memset_RecvBuff();
 	/*退出透传模式*/
 	while(ESP8266_SendCmd("+++",""));
-	delay_ms(500);
+	vTaskDelay(pdMS_TO_TICKS(500));
 	/*测试ESP8266是否能正常进行AT控制*/
 	printf("AT \r\n");
 	while(ESP8266_SendCmd("AT\r\n","OK"));
-	delay_ms(500);
+	vTaskDelay(pdMS_TO_TICKS(500));
 	/*ESP8266进行重新启动*/
 	
 	printf("AT+RST \r\n");
 	while(ESP8266_SendCmd("AT+RST\r\n",""));
 	//while(ESP8266_SendCmd("AT+RESTORE\r\n",""));
-	delay_ms(500);
+	vTaskDelay(pdMS_TO_TICKS(500));
 	/*清除数据回传显示输入命令*/
 	//printf("ATE0\r\n");
 	//while(ESP8266_SendCmd("ATE0\r\n","OK"));
@@ -61,11 +66,11 @@ void ESP8266_Init(void)
 	/*设置ESP8266为STA模式（客户端模式）*/
 	printf("AT+CWMODE_CUR\r\n");
 	while(ESP8266_SendCmd("AT+CWMODE_CUR=1\r\n", "OK"))
-	delay_ms(3000);
+	vTaskDelay(pdMS_TO_TICKS(3000));
 	/*设置对应wifi的账号和密码*/
 	printf("AT+CWJAP\r\n");
 	while(ESP8266_SendCmd(ESP8266_WIFI_INFO, "GOT IP"))
-	delay_ms(3000);
+	vTaskDelay(pdMS_TO_TICKS(3000));
 	printf("ESP8266 连接WIFI成功！！！\r\n");
 	
 	/*****************连接云服务器******************************/
@@ -76,7 +81,7 @@ void ESP8266_Init(void)
 	do{
 		ESP8266_memset_RecvBuff();
 		MQTT_Connect();
-		delay_ms(500);
+		vTaskDelay(pdMS_TO_TICKS(500));
 	/****************通过串口返回判断是否订阅成功  固定的******************/
 		if(recv_buf[0] == 0x20 && recv_buf[1] == 0x02)
 		{
@@ -91,7 +96,7 @@ void ESP8266_Init(void)
 		ESP8266_memset_RecvBuff();
 		
 		MQTT_SubscribeTopic();
-		delay_ms(500);
+		vTaskDelay(pdMS_TO_TICKS(500));
 		//MQTT_SubscribeTopic_web();
 		//Delay_ms(500);
 		
@@ -156,7 +161,7 @@ _Bool ESP8266_SendCmd(char *str, char* rev)
 				return 0;
 			}
 		}
-		delay_ms(10);
+		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 		return 1;
 }
@@ -173,7 +178,7 @@ void ESP8266_OpenTransmission(void)
 	//设置透传模式
 		memset(usart3_rxbuf,0,sizeof(usart3_rxbuf));    
 		while(ESP8266_SendCmd("AT+CIPMODE=1\r\n","OK"))
-		delay_ms(500);  
+		vTaskDelay(pdMS_TO_TICKS(500));  
 }
 
 
@@ -186,7 +191,7 @@ void ESP8266_OpenTransmission(void)
 void ESP8266_ExitUnvarnishedTrans(void)
 {
 	while(ESP8266_SendCmd("+++",""))
-	delay_ms(500);
+	vTaskDelay(pdMS_TO_TICKS(500));
 }
 
 
@@ -202,7 +207,7 @@ void ESP8266_ConnectServer(void)
 	//连接服务器
 	printf("AT+CIPSTART");
 	while(ESP8266_SendCmd(ESP8266_SERVER,"CONNECT"))
-	delay_ms(500);
+	vTaskDelay(pdMS_TO_TICKS(500));
 
 	//设置透传模式
 	ESP8266_OpenTransmission();
@@ -210,7 +215,7 @@ void ESP8266_ConnectServer(void)
 	//开启发送状态
 	printf("AT+CIPSEND"); 
 	while(ESP8266_SendCmd("AT+CIPSEND\r\n",">"))
-	delay_ms(500);//开始处于透传发送状态
+	vTaskDelay(pdMS_TO_TICKS(500));//开始处于透传发送状态
 
 }
 
@@ -293,5 +298,32 @@ void MQTT_RX_DATE_DEAL(char *buf)   // {"xxxx":"xxx","LED":1}
     }
   }
 		ptr = NULL;
+}
+
+/**
+ * @brief MQTT链路保活探测 (RTOS版新增)
+ * 透传模式下发 PINGREQ(0xC0 0x00), 正常时云端回 PINGRESP(0xD0 0x00),
+ * 会作为裸字节出现在 recv_buf 里; 等不到说明 TCP/MQTT 链路已断
+ * (WiFi掉线/TCP被服务端关闭/路由器NAT超时等), 调用方应重走接入流程
+ *
+ * @return 1=链路正常  0=超时无响应(链路断)
+ */
+uint8_t ESP8266_MQTT_PingCheck(void)
+{
+	uint16_t t;
+
+	ESP8266_memset_RecvBuff();
+	MQTT_SendHeart();                        /* PINGREQ: C0 00 */
+	for(t = 0; t < 200; t++)                 /* 最多等2s */
+	{
+		vTaskDelay(pdMS_TO_TICKS(10));
+		if(cnt >= 2 && recv_buf[0] == 0xD0)  /* PINGRESP: D0 00 */
+		{
+			ESP8266_memset_RecvBuff();
+			return 1;
+		}
+	}
+	ESP8266_memset_RecvBuff();
+	return 0;
 }
 

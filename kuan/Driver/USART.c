@@ -1,6 +1,18 @@
 #include "USART.h"
+#include "app_tasks.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 #include <stdio.h>
 #include <string.h>
+
+/* RTOS版中断优先级约定: NVIC 分组为 Group_4(全抢占), 所有用到
+ * FromISR API / 与任务共享数据的中断, 抢占优先级数值必须 >= 5
+ * (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY), 否则断言失败 */
+
+/* printf互斥锁: MicroLIB 的 stdio 内部无锁, 多任务并发 printf 会
+ * 破坏 C库状态导致随机卡死, 在 fputc 中串行化, USART_Config 创建 */
+static SemaphoreHandle_t s_printMutex = NULL;
 
 /* ============================================================
  *  USART2 + DX-BT24 BLE 蓝牙透传模块
@@ -59,8 +71,8 @@ void USART2_Config(uint32_t baud)
 
     /* 4. 中断: 接收中断 + 空闲中断(用于判断一帧结束) */
     NVIC_InitStructure.NVIC_IRQChannel                   = USART2_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 2;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
@@ -86,7 +98,11 @@ void USART2_IRQHandler(void)
     {
         USART_ReceiveData(USART2);   /* 读DR清除IDLE标志 */
         bt24_rx_buf[bt24_rx_len] = '\0';
-        if (bt24_rx_len > 0) bt24_rx_done = 1;
+        if (bt24_rx_len > 0)
+        {
+            bt24_rx_done = 1;
+            BLE_FrameIsrNotify();    /* 通知 blecmd 任务处理指令 (FromISR) */
+        }
     }
 }
 
@@ -137,8 +153,8 @@ void UART4_Config(uint32_t baud)
 
     /* 4. 接收中断 + 空闲中断 */
     NVIC_InitStructure.NVIC_IRQChannel                   = UART4_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 3;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
@@ -269,8 +285,8 @@ void USART_Config(uint32_t baud)
     NVIC_InitTypeDef mynvic = {0};
     mynvic.NVIC_IRQChannel = USART1_IRQn;
     mynvic.NVIC_IRQChannelCmd = ENABLE;
-    mynvic.NVIC_IRQChannelPreemptionPriority = 1;
-    mynvic.NVIC_IRQChannelSubPriority = 1;
+    mynvic.NVIC_IRQChannelPreemptionPriority = 5;
+    mynvic.NVIC_IRQChannelSubPriority = 0;
     
     NVIC_Init(&mynvic);
     
@@ -278,6 +294,12 @@ void USART_Config(uint32_t baud)
     USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
     // 使能USART1
     USART_Cmd(USART1, ENABLE);
+
+    /* printf互斥锁(预调度期创建一次): 保护多任务并发打印, 见 fputc */
+    if(s_printMutex == NULL)
+    {
+        s_printMutex = xSemaphoreCreateMutex();
+    }
 }
 
 // USART1中断变量
@@ -290,8 +312,11 @@ void USART1_IRQHandler(void)
     if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
     {
         u1_data = USART_ReceiveData(USART1);
-        u1_str[len++] = u1_data;
-        
+        if (len < sizeof(u1_str) - 1)   /* 防溢出: 缓冲满后丢弃 */
+        {
+            u1_str[len++] = u1_data;
+        }
+
         // 回显测试
         USART_SendData(USART1, u1_data);
     }
@@ -333,8 +358,8 @@ void UART3_Config(uint32_t BaudRate)
 
     /* 6. NVIC configuration */
     NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
@@ -405,10 +430,26 @@ void Send_Str(USART_TypeDef *USARTx, char *str)
 }
 
 // printf重定向到USART1
+/* 互斥锁在 USART_Config 中创建; 调度器未启动或中断上下文不加锁直通 */
 int fputc(int ch, FILE *f)
 {
+    uint8_t locked = 0;
+
+    if(s_printMutex != NULL &&
+       (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) == 0 &&
+       xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+    {
+        xSemaphoreTake(s_printMutex, portMAX_DELAY);
+        locked = 1;
+    }
+
     USART_SendData(USART1, (uint8_t)ch);
     while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
+
+    if(locked)
+    {
+        xSemaphoreGive(s_printMutex);
+    }
     return ch;
 }
 

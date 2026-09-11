@@ -33,6 +33,7 @@ void ESP8266_Init(void);
 void ESP8266_memset_RecvBuff(void);
 _Bool ESP8266_SendCmd(char *str, char* rev);
 void ESP8266_ConnectServer(void);
+uint8_t ESP8266_MQTT_PingCheck(void);   /* MQTT链路保活探测: 1正常 0断线 */
 void recv_data_control(char * data);
 void MQTT_RX_DATE_DEAL(char *recv_buf);
-#endif 
+#endif
